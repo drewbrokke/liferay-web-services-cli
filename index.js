@@ -26,6 +26,10 @@ else if (command === 'addpermission') {
 }
 else {
 	console.log('Available commands:');
+
 	console.log('adduser');
 	console.log('addrole');
+	console.log('adduserrole');
+	console.log('getrole');
+	console.log('addpermission');
 }
