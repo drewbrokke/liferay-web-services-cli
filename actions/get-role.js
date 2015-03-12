@@ -7,9 +7,18 @@ module.exports = function(args) {
 	var url = base + action;
 
 	function getRole() {
-		var role = {
-			roleId: args.id || args.i
-		};
+		var role = {};
+
+		var roleId = args.id || args.i;
+		var roleName = args.name || args.n;
+
+		if (roleId) {
+			role.roleId = roleId;
+		}
+		else if (roleName) {
+			role.name = roleName;
+			role.companyId = 20152;
+		}
 
 		var postData = {
 			url: url,
