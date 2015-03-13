@@ -2,22 +2,21 @@ var randomName = require('node-random-name');
 var sillyName = require('sillyname');
 var request = require('request');
 
-module.exports = function(args) {
-	var number = args.number || args.n || 1;
+module.exports = function(program) {
+	var number = !isNaN(program.number) ? program.number : 1;
 
-	var person = {};
 	var base = 'http://test@liferay.com:test@localhost:8080/api/jsonws';
 	var action = '/user/add-user';
 	var url = base + action;
 
 	function addUser(index) {
-		index = (number > 0 && (args.first || args.f) && (args.last || args.l)) ? index + 1 : '';
-		person = {};
+		index = (number > 0 && program.firstname && program.lastname) ? index + 1 : '';
+		var person = {};
 
-		var tempFullName = (args.s || args.silly) ? sillyName() : randomName();
+		var tempFullName = program.silly ? sillyName() : randomName();
 
-		person.first = args.first || args.f || tempFullName.split(' ')[0];
-		person.last = args.last || args.l || tempFullName.split(' ')[1];
+		person.first = program.firstname || tempFullName.split(' ')[0];
+		person.last = program.lastname || tempFullName.split(' ')[1];
 		person.fullName = person.first + ' ' + person.last;
 		person.email = person.first + person.last + index + '@liferay.com';
 
@@ -62,12 +61,14 @@ module.exports = function(args) {
 		if (!error && (response.statusCode == 200)) {
 			var user = JSON.parse(body);
 
+			console.log('');
 			console.log('USER ADDED');
 			console.log('Name: ', user.firstName + ' ' + user.lastName + '');
 			console.log('Password: test');
 			console.log('UserId: ', user.userId);
 		}
 		else {
+			console.log('');
 			console.log('Something went wrong...');
 			console.log('STATUS CODE: ', response.statusCode);
 			console.log('ERROR: ', error);

@@ -1,7 +1,7 @@
 var superb = require('superb');
 var request = require('request');
 
-module.exports = function(args) {
+module.exports = function(program) {
 	var base = 'http://test@liferay.com:test@localhost:8080/api/jsonws';
 	var action = '/role/get-role';
 	var url = base + action;
@@ -9,8 +9,8 @@ module.exports = function(args) {
 	function getRole() {
 		var role = {};
 
-		var roleId = args.id || args.i;
-		var roleName = args.name || args.n;
+		var roleId = program.id;
+		var roleName = program.rolename;
 
 		if (roleId) {
 			role.roleId = roleId;

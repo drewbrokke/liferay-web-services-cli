@@ -1,9 +1,8 @@
 var superb = require('superb');
 var request = require('request');
 
-module.exports = function(args) {
-	var number = args.number || args.n || 1;
-	var type = args.type || args.t || 1;
+module.exports = function(program) {
+	var type = (0 < program.type < 4) ? program.type : 1;
 	var typeLabel = getTypeLabel(type);
 
 	var base = 'http://test@liferay.com:test@localhost:8080/api/jsonws';
@@ -11,17 +10,17 @@ module.exports = function(args) {
 	var url = base + action;
 
 	function addRole(index) {
-		index = (number > 0 && (args.title || args.t)) ? index + 1 : '';
+		index = program.rolenamename ? index + 1 : '';
 
-		var title = superb().toUpperCase() + typeLabel;
+		var name = program.rolenamename || (superb().toUpperCase() + typeLabel);
 
 		var role = {
-			name: title,
+			name: name,
 			titleMap: JSON.stringify({
-				"en_US": title
+				"en_US": name
 			}),
 			descriptionMap: JSON.stringify({
-				"en_US": title + " DESCRIPTION."
+				"en_US": name + " DESCRIPTION."
 			}),
 			type: type
 		};
@@ -39,6 +38,7 @@ module.exports = function(args) {
 		if (!error && (response.statusCode == 200)) {
 			var role = JSON.parse(body);
 
+			console.log('');
 			console.log('ROLE ADDED');
 			console.log('Name: ', role.name);
 			console.log('RoleId: ', role.roleId);
@@ -65,7 +65,7 @@ module.exports = function(args) {
 		}
 	}
 
-	for (var i = 0; i < number; i++) {
+	for (var i = 0; i < program.number; i++) {
 		addRole(i);
 	}
 }

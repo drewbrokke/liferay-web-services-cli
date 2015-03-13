@@ -1,37 +1,88 @@
 #!/usr/bin/env node
 
-var request = require('request');
-var argv = require('minimist')(process.argv.slice(2));
+var program = require('commander');
 
-var command = argv._[0];
-var number = argv.n || argv.number;
+function list(val) {
+	return val.split(',');
+}
 
-if (command === 'adduser') {
-	console.log('Adding user...');
-	require('./actions/add-user.js')(argv);
-}
-else if (command === 'addrole') {
-	console.log('Adding role...');
-	require('./actions/add-role.js')(argv);
-}
-else if (command === 'adduserrole') {
-	console.log('Adding roles to user...');
-	require('./actions/add-user-role.js')(argv);
-}
-else if (command === 'getrole') {
-	console.log('Getting role...');
-	require('./actions/get-role.js')(argv);
-}
-else if (command === 'addpermission') {
-	console.log('Adding permission...');
-	require('./actions/add-resource-permission.js')(argv);
-}
-else {
-	console.log('Available commands:');
+program
+	.version('0.0.2')
+	.command('adduser')
+	.description('Add a new user to the database.')
+	.option('-f, --firstname <name>', 'The first name to use when creating a user or users. If no name is provided the one will be generated. [optional]')
+	.option('-l, --lastname <name>', 'The last name to use when creating a user or users. If no name is provided the one will be generated. [optional]')
+	.option('-N, --number <number of users>', 'The number of users to create. [optional]', Number, 1)
+	.option('-s, --silly', 'Generate a silly name. [optional]')
+	.action(function() {
+		console.log('Adding user...');
 
-	console.log('adduser');
-	console.log('addrole');
-	console.log('adduserrole');
-	console.log('getrole');
-	console.log('addpermission');
-}
+		require('./actions/add-user.js')(this);
+	});
+
+program
+	.command('addrole')
+	.description('Add a new role to the database.')
+	.option('-r, --rolename <role name>', 'The name of the role. If no name is provided the one will be generated. [optional]')
+	.option('-t, --type <type>', 'The type of role. Uses integer value. Defaults to 1.', Number, 1)
+	.option('-N, --number <number of users>', 'The number of users to create. [optional]', Number, 1)
+	.action(function() {
+		console.log('Adding role...');
+
+		require('./actions/add-role.js')(this);
+	});
+
+program
+	.command('adduserrole')
+	.description('Add a role to a user.')
+	.option('-r, --roles <roleIds>', 'One or more roleIds separated by commas.', list)
+	.option('-u, --user <userId>', 'User id to add a role to.', Number)
+	.action(function() {
+		try {
+			if (!this.user) {
+				throw new Error('A userId is required.');
+			}
+			else if (!this.roles) {
+				throw new Error('At least one roleId is required.')
+			}
+			else {
+				console.log('Adding roleIds(s) %j to user with Id %j', this.roles, this.user);
+				require('./actions/add-user-role.js')(this);
+			}
+		}
+		catch(e) {
+			console.log('');
+			console.log(e);
+			console.log('');
+		}
+	});
+
+program
+	.command('getrole <id or name>')
+	.description('Get a role from its roleId or its name. Requires one or the other')
+	.action(function(thing) {
+		try {
+			console.log('thing: ', thing);
+			if (false) {
+				throw new Error('Please use only an id or a name.');
+			}
+			else {
+				console.log('Getting role...');
+
+				require('./actions/get-role.js')(this);
+			}
+		}
+		catch(e) {
+			console.log('');
+			console.log(e);
+			console.log('');
+		}
+	})
+
+// # adduser
+// # addrole
+// # adduserrole
+// getrole
+// addpermission
+
+program.parse(process.argv);

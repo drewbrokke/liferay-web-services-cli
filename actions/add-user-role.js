@@ -1,6 +1,6 @@
 var request = require('request');
 
-module.exports = function(args) {
+module.exports = function(program) {
 	var base = 'http://test@liferay.com:test@localhost:8080/api/jsonws';
 	var action = '/role/add-user-roles';
 	var url = base + action;
@@ -31,7 +31,8 @@ module.exports = function(args) {
 	function callback(error, response, body) {
 		if (!error && (response.statusCode == 200)) {
 			var response = JSON.parse(body);
-			console.log('response: ', response);
+			console.log('');
+			console.log('Complete.');
 		}
 		else {
 			console.log('Something went wrong...');
@@ -60,36 +61,14 @@ module.exports = function(args) {
 		);
 	}
 
-	var roleIds = args.role || args.r;
-
-	if (roleIds && !Array.isArray(roleIds)) {
-		var tempArray = [];
-		tempArray.push(roleIds);
-		roleIds = tempArray;
-	}
+	var roleIds = program.roles;
 
 	var user = {
-		userId: args.user || args.u,
+		userId: program.user,
 		roleIds: JSON.stringify(roleIds)
 	};
 
-	if (roleIds) {
-		for (var i = 0, length = roleIds.length; i < length; i ++) {
-			verifyRole(roleIds[i]);
-		}
+	for (var i = 0, length = roleIds.length; i < length; i ++) {
+		verifyRole(roleIds[i]);
 	}
-	else {
-		console.log('Please include at least one role ID to add.');
-	}
-
-
-	// if (rolesVerified) {
-	// 	request.post(
-	// 		{
-	// 			url: url,
-	// 			form: user
-	// 		},
-	// 		callback
-	// 	);
-	// }
 }
