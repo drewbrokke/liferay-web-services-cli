@@ -1,9 +1,18 @@
 #!/usr/bin/env node
 
 var program = require('commander');
+var prettyjson = require('prettyjson');
 
 function list(val) {
 	return val.split(',');
+}
+
+function logJSON(obj) {
+	var options = {
+		stringColor: 'yellow'
+	}
+
+	console.log(prettyjson.render(obj, options))
 }
 
 program
@@ -19,13 +28,9 @@ program
 
 		function addUserCallback(error, response) {
 			if (!error) {
-				var person = JSON.parse(response);
-
 				console.log('');
-				console.log('USER ADDED');
-				console.log('Name: ', person.firstName + ' ' + person.lastName + '');
-				console.log('Password: test');
-				console.log('UserId: ', person.userId);
+				console.log('New User:');
+				logJSON(JSON.parse(response));
 			}
 		}
 
@@ -45,12 +50,7 @@ program
 
 		function addRoleCallback(error, body) {
 			if (!error) {
-				var role = JSON.parse(body);
-
-				console.log('');
-				console.log('ROLE ADDED');
-				console.log('Name: ', role.name);
-				console.log('RoleId: ', role.roleId);
+				logJSON(JSON.parse(body));
 			}
 		}
 
@@ -102,8 +102,15 @@ program
 
 		function addUserRoleCallback(error, response) {
 			if (!error) {
-
 				console.log('Assigned role %j to user %j.', program.generatedRole.name, program.generatedUser.screenName);
+
+				console.log('');
+				console.log('User:');
+				logJSON(program.generatedUser);
+
+				console.log('');
+				console.log('Role:');
+				logJSON(program.generatedRole);
 			}
 		}
 

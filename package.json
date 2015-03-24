@@ -11,6 +11,7 @@
   "dependencies": {
     "commander": "^2.7.1",
     "node-random-name": "^1.0.1",
+    "prettyjson": "^1.1.0",
     "request": "^2.53.0",
     "sillyname": "0.0.3",
     "superb": "^1.1.3"
