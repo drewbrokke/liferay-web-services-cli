@@ -9,7 +9,7 @@
   "author": "Drew Brokke",
   "license": "MIT",
   "dependencies": {
-    "minimist": "^1.1.1",
+    "commander": "^2.7.1",
     "node-random-name": "^1.0.1",
     "request": "^2.53.0",
     "sillyname": "0.0.3",
