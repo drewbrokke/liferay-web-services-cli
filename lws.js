@@ -9,7 +9,7 @@ function list(val) {
 program
 	.version('0.0.2')
 	.command('adduser')
-	.description('Add a new user to the database.')
+	.description('Add a new user to the database. Can be called with no arguments.')
 	.option('-f, --firstname <name>', 'The first name to use when creating a user or users. If no name is provided the one will be generated. [optional]')
 	.option('-l, --lastname <name>', 'The last name to use when creating a user or users. If no name is provided the one will be generated. [optional]')
 	.option('-N, --number <number of users>', 'The number of users to create. [optional]', Number, 1)
@@ -36,7 +36,7 @@ program
 
 program
 	.command('addrole')
-	.description('Add a new role to the database.')
+	.description('Add a new role to the database. Can be called with no arguments.')
 	.option('-r, --rolename <role name>', 'The name of the role. If no name is provided the one will be generated. [optional]')
 	.option('-t, --type <type>', 'The type of role. Uses integer value. Defaults to 1.', Number, 1)
 	.option('-N, --number <number of users>', 'The number of users to create. [optional]', Number, 1)
@@ -94,6 +94,7 @@ program
 
 program
 	.command('addnewuserrole')
+	.description('Assigns a new generated role to a new generated user.')
 	.action(function() {
 		console.log('Adding user...');
 
@@ -102,7 +103,7 @@ program
 		function addUserRoleCallback(error, response) {
 			if (!error) {
 
-				console.log('Added user %j, role %j, and added role to user', program.generatedUser, program.generatedRole);
+				console.log('Assigned role %j to user %j.', program.generatedRole.name, program.generatedUser.screenName);
 			}
 		}
 
