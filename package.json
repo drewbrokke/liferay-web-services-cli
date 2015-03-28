@@ -2,16 +2,19 @@
   "name": "liferay-web-services-cli",
   "version": "0.0.05",
   "description": "A command-line interface for Liferay's JSON Web Services",
-  "main": "lws.js",
+  "main": "commands/lws",
   "scripts": {
     "test": "test"
   },
   "author": "Drew Brokke",
   "license": "MIT",
   "dependencies": {
+    "async": "^0.9.0",
     "commander": "^2.7.1",
+    "lodash": "^3.6.0",
     "node-random-name": "^1.0.1",
     "prettyjson": "^1.1.0",
+    "progress": "^1.1.8",
     "request": "^2.53.0",
     "sillyname": "0.0.3",
     "superb": "^1.1.3"
@@ -31,6 +34,6 @@
   "homepage": "https://github.com/drewbrokke/liferay-web-services-cli",
   "preferGlobal": true,
   "bin": {
-    "lws": "lws.js"
+    "lws": "commands/lws"
   }
 }
