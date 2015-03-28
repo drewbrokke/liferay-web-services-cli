@@ -1,0 +1,59 @@
+#!/usr/bin/env node
+
+var async = require('async');
+var program = require('commander');
+var superb = require('superb');
+var utils = require('../lib/utils');
+
+program
+	.option('-t, --type <type>', 'The type of role. Uses integer value. Defaults to 1.', Number, 1)
+	.parse(process.argv);
+
+var numberOfRoles = Number(program.args[0]) || 1;
+var bar = utils.getProgressBar(numberOfRoles);
+
+function getTypeLabel(type) {
+	if (type === 1) {
+		return " Regular Role";
+	}
+	else if (type === 2) {
+		return " Site Role";
+	}
+	else if (type === 3) {
+		return " Organization Role";
+	}
+	else {
+		return " Role";
+	}
+}
+
+utils.statusMessage(numberOfRoles, 'role');
+
+async.timesSeries(
+	numberOfRoles,
+	function(n, callback) {
+		var type = program.type;
+		var typeLabel = getTypeLabel(type);
+
+		var name = superb().toUpperCase() + typeLabel;
+
+		require('../actions/add-role.js')(name, type, function(error, response) {
+			if (!error) {
+				bar.tick();
+				callback(null, response);
+			}
+		})
+	},
+	function(error, results) {
+		if (!error) {
+			for (var i = 0, length = results.length; i < length; i++) {
+				console.log('');
+				console.log('New Role:');
+				utils.logJSON(JSON.parse(results[i]));
+				console.log('');
+			}
+
+			console.log('Successfully added', + results.length + ' new role(s).');
+		}
+	}
+);
