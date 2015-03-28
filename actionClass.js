@@ -1,4 +1,5 @@
 var request = require('request');
+var utils = require('./lib/utils');
 
 function Action(actionPath, payload) {
 	this.actionPath = 'http://test@liferay.com:test@localhost:8080/api/jsonws' + actionPath;
@@ -21,11 +22,19 @@ Action.prototype.doAction = function(callback) {
 				form: payload
 			},
 			function(error, response, body) {
-				if (!error && (response.statusCode == 200)) {
-					callback(null, body);
+				if (!error) {
+					if (response.statusCode === 200) {
+						callback(null, body);
+					}
+					else {
+						var serverError = JSON.parse(response.body).error;
+
+						console.log('');
+						utils.logJSON(serverError);
+						console.log('');
+					}
 				}
 				else {
-					console.error('STATUS CODE: ', response.statusCode);
 					console.error('ERROR: ', error);
 					callback(error);
 				}
