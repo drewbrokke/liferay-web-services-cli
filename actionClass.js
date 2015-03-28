@@ -30,7 +30,7 @@ Action.prototype.doAction = function(callback) {
 						var serverError = JSON.parse(response.body).error;
 
 						console.log('');
-						utils.logJSON(serverError);
+						utils.printJSON(serverError);
 						console.log('');
 					}
 				}

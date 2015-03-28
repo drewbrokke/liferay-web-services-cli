@@ -32,7 +32,7 @@ async.timesSeries(
 			for (var i = 0, length = results.length; i < length; i++) {
 				console.log('');
 				console.log('New Role:');
-				utils.logJSON(JSON.parse(results[i]));
+				utils.printJSON(JSON.parse(results[i]));
 				console.log('');
 			}
 

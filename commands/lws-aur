@@ -45,7 +45,7 @@ else {
 
 					console.log('');
 					console.log('Added User:');
-					utils.logJSON(user);
+					utils.printJSON(user);
 					console.log('');
 
 					asyncCallback(null, user);
@@ -82,7 +82,7 @@ else {
 
 					console.log('');
 					console.log('Added Role:');
-					utils.logJSON(role);
+					utils.printJSON(role);
 					console.log('');
 
 					asyncCallback(null, role);
