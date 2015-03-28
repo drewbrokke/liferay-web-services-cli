@@ -12,30 +12,13 @@ program
 var numberOfRoles = Number(program.args[0]) || 1;
 var bar = utils.getProgressBar(numberOfRoles);
 
-function getTypeLabel(type) {
-	if (type === 1) {
-		return " Regular Role";
-	}
-	else if (type === 2) {
-		return " Site Role";
-	}
-	else if (type === 3) {
-		return " Organization Role";
-	}
-	else {
-		return " Role";
-	}
-}
-
 utils.statusMessage(numberOfRoles, 'role');
 
 async.timesSeries(
 	numberOfRoles,
 	function(n, callback) {
 		var type = program.type;
-		var typeLabel = getTypeLabel(type);
-
-		var name = superb().toUpperCase() + typeLabel;
+		var name = utils.generateRoleName(type);
 
 		require('../actions/add-role.js')(name, type, function(error, response) {
 			if (!error) {
