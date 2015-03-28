@@ -1,0 +1,46 @@
+#!/usr/bin/env node
+
+var async = require('async');
+var program = require('commander');
+var utils = require('../lib/utils');
+var randomName = require('node-random-name');
+var sillyName = require('sillyname');
+
+program
+	.option('-s, --silly', 'Generate a silly name. [optional]')
+	.parse(process.argv);
+
+var numberOfUsers = Number(program.args[0]) || 1;
+var bar = utils.getProgressBar(numberOfUsers);
+
+utils.statusMessage(numberOfUsers, 'user');
+
+async.timesSeries(
+	numberOfUsers,
+	function(n, callback) {
+		var fullName = program.silly ? sillyName() : randomName();
+		var firstName = fullName.split(' ')[0];
+		var lastName = fullName.split(' ')[1];
+		var emailAddress = firstName + lastName + '@liferay.com';
+		var screenName = fullName.replace(' ', '');
+
+		require('../actions/add-user.js')(firstName, lastName, screenName, emailAddress, function(error, response) {
+			if (!error) {
+				bar.tick();
+				callback(null, response);
+			}
+		})
+	},
+	function(error, results) {
+		if (!error) {
+			for (var i = 0, length = results.length; i < length; i++) {
+				console.log('');
+				console.log('New User:');
+				utils.logJSON(JSON.parse(results[i]));
+				console.log('');
+			}
+
+			console.log('Successfully added', + results.length + ' new users.');
+		}
+	}
+);

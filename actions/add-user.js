@@ -1,31 +1,20 @@
-var randomName = require('node-random-name');
-var sillyName = require('sillyname');
 var Action = require('../actionClass');
 
-module.exports = function(program, callback) {
-	var person = {};
-
-	var tempFullName = program.silly ? sillyName() : randomName();
-
-	person.first = program.firstname || tempFullName.split(' ')[0];
-	person.last = program.lastname || tempFullName.split(' ')[1];
-	person.fullName = person.first + ' ' + person.last;
-	person.email = person.first + person.last + '@liferay.com';
-
+module.exports = function(firstName, lastName, screenName, emailAddress, callback) {
 	var user =  {
 		companyId: 20152,
 		autoPassword: false,
 		password1: 'test',
 		password2: 'test',
 		autoScreenName: false,
-		screenName: person.fullName.replace(' ', ''),
-		emailAddress: person.email,
+		screenName: screenName,
+		emailAddress: emailAddress,
 		facebookId: 0,
 		openId: '',
 		locale: null,
-		firstName: person.first.replace(' ', ''),
+		firstName: firstName,
 		middleName: '',
-		lastName: person.last.replace(' ', ''),
+		lastName: lastName,
 		prefixId: 0,
 		suffixId: 0,
 		male: true,
