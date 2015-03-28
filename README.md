@@ -11,11 +11,15 @@ During development and debugging of the master branch, I got very tired of havin
 - Create a role
 - Assign the role to the user
 
-I mostly wanted to see if I could get that process down to a single command in the shell (success!). This is useful for me personally, but I would like to see broader and more useful functionality added. 
+I mostly wanted to see if I could get that process down to a single command in the shell (success!). This is useful for me personally, but I would like to see broader and more useful functionality added.
 
-My current challenge is figuring out how to structure the application to make it modular and pluggable, as I have no desire to write an action for every single available web service but would *love* to allow others to add them as they need them.
+I plan on adding more actions:
+- Adding sites, site members, and site pages
+- Adding user groups
+- Adding Organizations and members
+- And hopefully more...
 
-If you happen to look through the source code and have an idea or suggestion for improvement, please open a Github issue or send a pull request.  This is a side project for me so response and progress will be slow, but I welcome input as I have limited experience structuring apps.
+If you happen to look through the source code and have an idea or suggestion for improvement, please open a Github issue or send a pull request.
 
 ## Installing
 ```
@@ -30,19 +34,34 @@ lws <command> [options]
 **Examples:**
 ```
 # Adds a new user
-lws adduser
+lws au
 
-# Adds a new user with a firstName of Joseph
-lws adduser -f Joseph
+# Adds x new users
+lws au 20
+
+# Gets an existing user
+lws gu 12345 (userId)
+lws gu userScreenName
+lws gu useremail@usermail.com
 
 # Adds a new role
-lws addrole
+lws ar
+
+# Adds x new roles
+lws ar 3
+
+# Adds a new role of type 2 (site role)
+lws ar -t 2
+
+# Gets an existing role
+lws gr 12345 (roleId)
+lws gr roleName
 
 # Creates a new user, a new role, and assigns the role to the user
-lws adduserrole
+lws aur
 
 # Assigns a specific role to a specific user
-lws adduserrole -u 12345 -r 54321
+lws aur -u 12345 -r 54321
 ```
 
 **Help:**
