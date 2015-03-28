@@ -1,0 +1,37 @@
+#!/usr/bin/env node
+
+var async = require('async');
+var program = require('commander');
+var utils = require('../lib/utils');
+var getUserActionRouter = require('../method-routers/get-user-router');
+
+program.parse(process.argv);
+
+userInfo = program.args;
+
+if (!userInfo.length) {
+	console.error('Please provide user info.');
+}
+
+async.timesSeries(
+	userInfo.length,
+	function(n, asyncCallback) {
+		var getUserAction = getUserActionRouter(userInfo[n]);
+
+		require(getUserAction)(userInfo[n], function(error, response) {
+			if (!error) {
+				asyncCallback(null, response);
+			}
+		});
+	},
+	function(error, results) {
+		if (!error) {
+			for (var i = 0, length = results.length; i < length; i++) {
+				console.log('');
+				console.log('Got User:');
+				utils.logJSON(JSON.parse(results[i]));
+				console.log('');
+			}
+		}
+	}
+);
