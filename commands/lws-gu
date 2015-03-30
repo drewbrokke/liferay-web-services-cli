@@ -4,34 +4,52 @@ var async = require('async');
 var program = require('commander');
 var utils = require('../lib/utils');
 var getUserActionRouter = require('../method-routers/get-user-router');
+var _ = require('lodash');
 
 program.parse(process.argv);
 
 userInfo = program.args;
 
-if (!userInfo.length) {
-	console.error('Please provide user info.');
-}
+if (userInfo.length) {
+	// Get Users from provided info
+	async.timesSeries(
+		userInfo.length,
+		function(n, asyncCallback) {
+			var getUserAction = getUserActionRouter(userInfo[n]);
 
-async.timesSeries(
-	userInfo.length,
-	function(n, asyncCallback) {
-		var getUserAction = getUserActionRouter(userInfo[n]);
-
-		require(getUserAction)(userInfo[n], function(error, response) {
+			require(getUserAction)(userInfo[n], function(error, response) {
+				if (!error) {
+					asyncCallback(null, response);
+				}
+			});
+		},
+		function(error, results) {
 			if (!error) {
-				asyncCallback(null, response);
-			}
-		});
-	},
-	function(error, results) {
-		if (!error) {
-			for (var i = 0, length = results.length; i < length; i++) {
-				console.log('');
-				console.log('Got User:');
-				utils.printJSON(JSON.parse(results[i]));
-				console.log('');
+				for (var i = 0, length = results.length; i < length; i++) {
+					console.log('');
+					console.log('Got User:');
+					utils.printJSON(JSON.parse(results[i]));
+					console.log('');
+				}
 			}
 		}
-	}
-);
+	);
+}
+else {
+	// Get all users in the company
+	require('../actions/get-company-users')(function(error, response) {
+		if (!error) {
+			var users = JSON.parse(response);
+
+			console.log('');
+
+			_.forEach(users, function(user) {
+				console.log('Got User:');
+				user = _.pick(user, ['screenName', 'firstName', 'lastName', 'emailAddress', 'userId']);
+
+				utils.printJSON(user);
+				console.log('');
+			})
+		}
+	});
+}
