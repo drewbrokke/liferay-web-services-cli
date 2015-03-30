@@ -1,0 +1,39 @@
+#!/usr/bin/env node
+
+var async = require('async');
+var program = require('commander');
+var utils = require('../lib/utils');
+
+program
+	.parse(process.argv);
+
+var numberOfGroups = Number(program.args[0]) || 1;
+var bar = utils.getProgressBar(numberOfGroups);
+
+utils.statusMessage(numberOfGroups, 'group');
+
+async.timesSeries(
+	numberOfGroups,
+	function(n, callback) {
+		var groupName = utils.generateGroupName();
+
+		require('../actions/add-group.js')(groupName, function(error, response) {
+			if (!error) {
+				bar.tick();
+				callback(null, response);
+			}
+		});
+	},
+	function(error, results) {
+		if (!error) {
+			for (var i = 0, length = results.length; i < length; i++) {
+				console.log('');
+				console.log('New Group:');
+				utils.printJSON(JSON.parse(results[i]));
+				console.log('');
+			}
+
+			console.log('Successfully added', + results.length + ' new groups.');
+		}
+	}
+);
