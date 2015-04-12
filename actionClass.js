@@ -1,8 +1,17 @@
 var request = require('request');
 var utils = require('./lib/utils');
+var config = require('./lib/config').getActiveInstanceConfig();
 
 function Action(actionPath, payload) {
-	this.actionPath = 'http://test@liferay.com:test@localhost:8080/api/jsonws' + actionPath;
+	var actionPathBase = [
+		'http://',
+		config.username + ':',
+		config.password + '@',
+		config.domain + ':',
+		config.port + '/api/jsonws'
+	].join('');
+
+	this.actionPath = actionPathBase + actionPath;
 	this.payload = payload;
 }
 

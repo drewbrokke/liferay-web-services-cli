@@ -1,0 +1,220 @@
+#!/usr/bin/env node
+
+var async = require('async');
+var program = require('commander');
+var utils = require('../lib/utils');
+var inquirer = require('inquirer');
+var config = require('../lib/config');
+var _ = require('lodash');
+
+program.parse(process.argv);
+
+var actions = {
+	addInstanceAnswer: 'ADD a new portal instance configuration.',
+	editInstanceAnswer: 'EDIT a portal instance configuration.',
+	deleteInstanceAnswer: 'DELETE a portal instance configuration.',
+	listInstancesAnswer: 'LIST current portal instance configurations.',
+	useInstanceAnswer: 'USE a different portal instance configuration.'
+};
+
+var command = program.args[0];
+
+var instanceConfigList = config.getInstanceConfigList();
+
+var whichActionQuestion = {
+	type: 'list',
+	name: 'action',
+	message: 'What would you like to do?',
+	choices: [
+		actions.addInstanceAnswer,
+		actions.editInstanceAnswer,
+		actions.deleteInstanceAnswer,
+		actions.listInstancesAnswer,
+		actions.useInstanceAnswer
+	]
+};
+
+function addInstance() {
+	var defaultName = 'Instance config ' + instanceConfigList.length;
+	var defaultUserName = 'test@liferay.com';
+	var defaultPassword = 'test';
+	var defaultDomain = 'localhost';
+	var defaultPort = '8080';
+	var defaultPortalVersion = 'master';
+
+	configureInstance(defaultName, defaultUserName, defaultPassword, defaultDomain, defaultPort, defaultPortalVersion);
+}
+
+function configureInstance(defaultName, defaultUserName, defaultPassword, defaultDomain, defaultPort, defaultPortalVersion) {
+	var configNameQuestion = {
+		name: 'instanceName',
+		message: 'What would you like to name this instance configuration?',
+		default: defaultName
+	};
+
+	var userNameQuestion = {
+		name: 'userName',
+		message: 'Username or email address?',
+		default: defaultUserName
+	};
+
+	var passwordQuestion = {
+		name: 'password',
+		message: 'Password?',
+		default: defaultPassword
+	};
+
+	var domainQuestion = {
+		name: 'domain',
+		message: 'Domain?',
+		default: defaultDomain
+	};
+
+	var portQuestion = {
+		name: 'port',
+		message: 'Port?',
+		default: defaultPort
+	};
+
+	var portalVersionQuestion = {
+		type: 'list',
+		name: 'portalVersion',
+		message: 'Portal Version?',
+		default: defaultPortalVersion,
+		choices: [
+			'master',
+			'6.2',
+			'6.1'
+		]
+	};
+
+	var questions = [
+		configNameQuestion,
+		userNameQuestion,
+		passwordQuestion,
+		domainQuestion,
+		portQuestion,
+		portalVersionQuestion
+	]
+
+	inquirer.prompt(questions, function(answers) {
+		config.setInstanceConfig(answers.instanceName, answers.userName, answers.password, answers.domain, answers.port, answers.portalVersion);
+	});
+}
+
+function deleteInstance() {
+	var instanceName = program.args[1];
+	var instanceConfig = config.getInstanceConfig(instanceName);
+
+	if (instanceName && !!instanceConfig) {
+		config.deleteInstanceConfig(instanceName)
+	}
+	else {
+		var deleteInstanceQuestion = {
+			type: 'list',
+			name: 'instanceName',
+			message: 'Which instance configuration would you like to delete?',
+			choices: instanceConfigList
+		};
+
+		inquirer.prompt([deleteInstanceQuestion], function(answers) {
+			if (answers.instanceName != 'default') {
+				config.deleteInstanceConfig(answers.instanceName)
+			}
+			else {
+				console.log('You cannot delete the default instance configuration.');
+			}
+		});
+	}
+}
+
+function editInstance() {
+	var instanceName = program.args[1];
+	var instanceConfig = config.getInstanceConfig(instanceName);
+
+	if (instanceName && !!instanceConfig) {
+		var instanceConfig = instanceConfig;
+
+		configureInstance(instanceName, instanceConfig.username, instanceConfig.password, instanceConfig.domain, instanceConfig.port, instanceConfig.portalVersion);
+	}
+	else {
+		var editInstanceQuestion = {
+			type: 'list',
+			name: 'instanceName',
+			message: 'Which instance configuration would you like to edit?',
+			choices: instanceConfigList
+		};
+
+		inquirer.prompt([editInstanceQuestion], function(answers) {
+			instanceName = answers.instanceName;
+			instanceConfig = config.getInstanceConfig(instanceName);
+
+			configureInstance(instanceName, instanceConfig.username, instanceConfig.password, instanceConfig.domain, instanceConfig.port, instanceConfig.portalVersion);
+		});
+	}
+}
+
+function listInstances() {
+	console.log('');
+	_.forEach(config.getInstanceConfigs(), function(instance, instanceName) {
+		var appendix = ':';
+
+		if (instanceName === config.getActiveInstanceName()) {
+			appendix = ' (ACTIVE):'
+		}
+
+		console.log(instanceName + appendix);
+		utils.printJSON(instance);
+		console.log('');
+	});
+}
+
+function routeAction(action) {
+	if (action === 'add') {
+		addInstance();
+	}
+	else if (action === 'edit') {
+		editInstance();
+	}
+	else if (action === 'delete') {
+		deleteInstance();
+	}
+	else if (action === 'list') {
+		listInstances();
+	}
+	else if (action === 'use') {
+		useInstance();
+	}
+}
+
+function useInstance() {
+	var instanceName = program.args[1];
+	var instanceConfig = config.getInstanceConfig(instanceName);
+
+	if (instanceName && !!instanceConfig) {
+		config.setActiveInstanceConfig(instanceName);
+	}
+	else {
+		var useInstanceQuestion = {
+			type: 'list',
+			name: 'instanceName',
+			message: 'Which instance configuration would you like to use?',
+			choices: instanceConfigList
+		};
+
+		inquirer.prompt([useInstanceQuestion], function(answers) {
+			config.setActiveInstanceConfig(answers.instanceName);
+		});
+	}
+}
+
+if (command) {
+	routeAction(command.toLowerCase())
+}
+else {
+	console.log('');
+	inquirer.prompt([whichActionQuestion], function(answers) {
+		routeAction(answers.action);
+	});
+}
+

@@ -1,6 +1,13 @@
 #!/usr/bin/env node
 
 var program = require('commander');
+var userhome = require('userhome');
+var fs = require('fs');
+var path = require('path');
+
+if (!fs.existsSync(userhome('.lws.json'))) {
+	require('../lib/config').init();
+}
 
 program
 	.version(require('../package.json').version)
@@ -10,7 +17,8 @@ program
 	.command('ar [number]', 'add-role | Adds one or more new roles to the database. Number is optional (defaults to one).')
 	.command('aur', 'add-user-role | Assigns a role to a user.  Will create a new role and user if they are not provided.')
 	.command('gu <userInfo>', 'get-user | Gets a user from the database based on userId, screenName, or emailAddress.')
-	.command('gr <roleInfo>', 'get-role | Gets a role from the database based on roleId or roleName.');
+	.command('gr <roleInfo>', 'get-role | Gets a role from the database based on roleId or roleName.')
+	.command('config', 'Configure LWS.');
 
 // Some logic that searches global dirs and finds modules
 // Each calls 'program.command()'
