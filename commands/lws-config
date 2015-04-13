@@ -46,11 +46,17 @@ function addInstance() {
 }
 
 function configureInstance(defaultName, defaultUserName, defaultPassword, defaultDomain, defaultPort, defaultPortalVersion) {
-	var configNameQuestion = {
-		name: 'instanceName',
-		message: 'What would you like to name this instance configuration?',
-		default: defaultName
-	};
+	var questions = [];
+
+	if (defaultName != 'default') {
+		var configNameQuestion = {
+			name: 'instanceName',
+			message: 'What would you like to name this instance configuration?',
+			default: defaultName
+		};
+
+		questions.push(configNameQuestion);
+	}
 
 	var userNameQuestion = {
 		name: 'userName',
@@ -58,11 +64,15 @@ function configureInstance(defaultName, defaultUserName, defaultPassword, defaul
 		default: defaultUserName
 	};
 
+	questions.push(userNameQuestion);
+
 	var passwordQuestion = {
 		name: 'password',
 		message: 'Password?',
 		default: defaultPassword
 	};
+
+	questions.push(passwordQuestion);
 
 	var domainQuestion = {
 		name: 'domain',
@@ -70,11 +80,15 @@ function configureInstance(defaultName, defaultUserName, defaultPassword, defaul
 		default: defaultDomain
 	};
 
+	questions.push(domainQuestion);
+
 	var portQuestion = {
 		name: 'port',
 		message: 'Port?',
 		default: defaultPort
 	};
+
+	questions.push(portQuestion);
 
 	var portalVersionQuestion = {
 		type: 'list',
@@ -88,22 +102,21 @@ function configureInstance(defaultName, defaultUserName, defaultPassword, defaul
 		]
 	};
 
-	var questions = [
-		configNameQuestion,
-		userNameQuestion,
-		passwordQuestion,
-		domainQuestion,
-		portQuestion,
-		portalVersionQuestion
-	]
+	questions.push(portalVersionQuestion);
 
 	inquirer.prompt(questions, function(answers) {
-		config.setInstanceConfig(answers.instanceName, answers.userName, answers.password, answers.domain, answers.port, answers.portalVersion);
+		if (defaultName != 'default') {
+			config.deleteInstanceConfig(defaultName);
+		}
+
+		var configName = answers.instanceName || defaultName;
+
+		config.setInstanceConfig(configName, answers.userName, answers.password, answers.domain, answers.port, answers.portalVersion);
 	});
 }
 
-function deleteInstance() {
-	var instanceName = program.args[1];
+function deleteInstance(instanceName) {
+	instanceName = instanceName || program.args[1];
 	var instanceConfig = config.getInstanceConfig(instanceName);
 
 	if (instanceName && !!instanceConfig) {
@@ -170,19 +183,19 @@ function listInstances() {
 }
 
 function routeAction(action) {
-	if (action === 'add') {
+	if (action === 'add' || action === actions.addInstanceAnswer) {
 		addInstance();
 	}
-	else if (action === 'edit') {
+	else if (action === 'edit' || action === actions.editInstanceAnswer) {
 		editInstance();
 	}
-	else if (action === 'delete') {
+	else if (action === 'delete' || action === actions.deleteInstanceAnswer) {
 		deleteInstance();
 	}
-	else if (action === 'list') {
+	else if (action === 'list' || action === actions.listInstancesAnswer) {
 		listInstances();
 	}
-	else if (action === 'use') {
+	else if (action === 'use' || action === actions.useInstanceAnswer) {
 		useInstance();
 	}
 }
