@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 
+var _ = require('lodash');
 var async = require('async');
 var program = require('commander');
 var utils = require('../lib/utils');
+
 var getUserActionRouter = require('../method-routers/get-user-router');
-var _ = require('lodash');
 
 program.parse(process.argv);
 

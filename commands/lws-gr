@@ -3,6 +3,7 @@
 var async = require('async');
 var program = require('commander');
 var utils = require('../lib/utils');
+
 var getRoleActionRouter = require('../method-routers/get-role-router');
 
 program.parse(process.argv);

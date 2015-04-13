@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
 var async = require('async');
+var getRoleActionRouter = require('../method-routers/get-role-router');
+var getUserActionRouter = require('../method-routers/get-user-router');
 var program = require('commander');
 var utils = require('../lib/utils');
-var getUserActionRouter = require('../method-routers/get-user-router');
-var getRoleActionRouter = require('../method-routers/get-role-router');
 
 program
 	.option('-u, --userInfo <userInfo>', 'User id to add a role to.')

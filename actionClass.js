@@ -1,6 +1,6 @@
+var config = require('./lib/config').getActiveInstanceConfig();
 var request = require('request');
 var utils = require('./lib/utils');
-var config = require('./lib/config').getActiveInstanceConfig();
 
 function Action(actionPath, payload) {
 	var actionPathBase = [

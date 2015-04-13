@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
-var program = require('commander');
-var userhome = require('userhome');
 var fs = require('fs');
 var path = require('path');
+var program = require('commander');
+var userhome = require('userhome');
 
 if (!fs.existsSync(userhome('.lws.json'))) {
 	require('../lib/config').init();

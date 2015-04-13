@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
+var _ = require('lodash');
 var async = require('async');
+var config = require('../lib/config');
+var inquirer = require('inquirer');
 var program = require('commander');
 var utils = require('../lib/utils');
-var inquirer = require('inquirer');
-var config = require('../lib/config');
-var _ = require('lodash');
 
 program.parse(process.argv);
 
