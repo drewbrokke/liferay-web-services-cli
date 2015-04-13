@@ -1,34 +1,20 @@
-var config = require('./lib/config').getActiveInstanceConfig();
 var request = require('request');
 var utils = require('./lib/utils');
 
-function Action(actionPath, payload) {
-	var actionPathBase = [
-		'http://',
-		config.username + ':',
-		config.password + '@',
-		config.domain + ':',
-		config.port + '/api/jsonws'
-	].join('');
-
-	this.actionPath = actionPathBase + actionPath;
-	this.payload = payload;
+function Action(actionPath, url) {
+	this.actionPath = 'http://test@liferay.com:test@localhost:8080/web/guest/connect/-' + actionPath + url;
 }
 
 Action.prototype.doAction = function(callback) {
 	var payload = this.payload;
 
 	try {
-		if (!payload) {
-			throw new Error('Missing payload object');
-		}
 		if (!callback) {
 			throw new Error('Missing callback function');
 		}
 		request.post(
 			{
 				url: this.actionPath,
-				form: payload
 			},
 			function(error, response, body) {
 				if (!error) {
@@ -53,6 +39,6 @@ Action.prototype.doAction = function(callback) {
 	catch(e) {
 		console.error(e);
 	}
-}
+};
 
 module.exports = Action;

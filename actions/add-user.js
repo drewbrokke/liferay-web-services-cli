@@ -24,7 +24,7 @@ module.exports = function(firstName, lastName, screenName, emailAddress, callbac
 		jobTitle: '',
 		groupIds: null,
 		organizationIds: null,
-		roleIds: null,
+		roleIds: 20455,
 		userGroupIds: null,
 		sendEmail: false
 	};

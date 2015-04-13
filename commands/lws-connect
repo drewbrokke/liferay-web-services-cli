@@ -1,0 +1,121 @@
+#!/usr/bin/env node
+
+var async = require('async');
+var program = require('commander');
+var utils = require('../lib/utils');
+
+var addDivision = function(type, amount) {
+	var numberOfDivisions = Number(amount) || 1;
+	var bar = utils.getProgressBar(numberOfDivisions);
+
+	utils.statusMessage(numberOfDivisions, 'division');
+
+	async.timesSeries(
+		numberOfDivisions,
+		function(n, callback) {
+			var division = {
+				name: utils.generateName(),
+				description: utils.generateDescription(),
+				type: type
+			};
+
+			if (type === 4) {
+				division.name = utils.generateLocation();
+			}
+
+			require('../actions/add-connect-division.js')(division, function(error, response) {
+				if (!error) {
+					bar.tick();
+					callback(null, response);
+				}
+			});
+		},
+		function(error, results) {
+			if (!error) {
+				console.log('Successfully added', + results.length + ' new divisions.');
+			}
+		}
+	);
+};
+
+program
+	.option('-u, --addUsers [number]', 'Add Connect Persons')
+	.option('-t, --addTopics [number]', 'Add Connect Topics')
+	.option('-o, --addOffice [number]', 'Add Connect Office')
+	.option('-T, --addTeam [number]', 'Add Connect Team')
+	.option('-d, --addDepartment [number]', 'Add Connect Department')
+	.parse(process.argv);
+
+	if (program.addUsers) {
+		var numberOfUsers = Number(program.addUsers) || 1;
+		var bar = utils.getProgressBar(numberOfUsers);
+
+		utils.statusMessage(numberOfUsers, 'user');
+
+		async.timesSeries(
+			numberOfUsers,
+			function(n, callback) {
+				var person = utils.generateUserInfo();
+
+				require('../actions/add-connect-user.js')(person, function(error, response) {
+					if (!error) {
+						bar.tick();
+						callback(null, response);
+					}
+				});
+			},
+			function(error, results) {
+				if (!error) {
+					console.log('Successfully added', + results.length + ' new users.');
+				}
+			}
+		);
+	}
+
+	else if (program.addTopics) {
+		var numberOfTopics = Number(program.addTopics) || 1;
+		var bar = utils.getProgressBar(numberOfTopics);
+
+		utils.statusMessage(numberOfTopics, 'topic');
+
+		async.timesSeries(
+			numberOfTopics,
+			function(n, callback) {
+				var topic = {
+					name: utils.generateName(),
+					description: utils.generateDescription()
+				};
+
+				require('../actions/add-connect-topic.js')(topic, function(error, response) {
+					if (!error) {
+						bar.tick();
+						callback(null, response);
+					}
+				});
+			},
+			function(error, results) {
+				if (!error) {
+					console.log('Successfully added', + results.length + ' new topics.');
+				}
+			}
+		);
+	}
+	else if (program.addDepartment) {
+		addDivision(2, program.addDepartment);
+	}
+	else if (program.addTeam) {
+		addDivision(3, program.addTeam);
+	}
+	else if (program.addOffice) {
+		addDivision(4, program.addOffice);
+	}
+	else {
+		program.outputHelp();
+
+		console.log('NOTE:');
+		console.log('Must have properties set in portal-ext');
+		console.log('');
+		console.log('auto.login.hooks=com.liferay.portal.security.auth.BasicAuthHeaderAutoLogin');
+		console.log('auth.token.ignore.portlets=82,1_WAR_connectportlet');
+		console.log('');
+	}
