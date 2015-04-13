@@ -13,6 +13,9 @@ function Action(actionPath, payload) {
 
 	this.actionPath = actionPathBase + actionPath;
 	this.payload = payload;
+
+	console.log('this.actionPath', this.actionPath);
+	console.log('this.payload', this.payload);
 }
 
 Action.prototype.doAction = function(callback) {

@@ -2,7 +2,7 @@ var Action = require('../actionClass');
 
 module.exports = function(firstName, lastName, screenName, emailAddress, callback) {
 	var user =  {
-		companyId: 20152,
+		companyId: 20155,
 		autoPassword: false,
 		password1: 'test',
 		password2: 'test',
