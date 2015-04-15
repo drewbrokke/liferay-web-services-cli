@@ -38,14 +38,14 @@ function addInstance() {
 	var defaultName = 'Instance config ' + instanceConfigList.length;
 	var defaultUserName = 'test@liferay.com';
 	var defaultPassword = 'test';
-	var defaultDomain = 'localhost';
+	var defaultHost = 'localhost';
 	var defaultPort = '8080';
 	var defaultPortalVersion = 'master';
 
-	configureInstance(defaultName, defaultUserName, defaultPassword, defaultDomain, defaultPort, defaultPortalVersion);
+	configureInstance(defaultName, defaultUserName, defaultPassword, defaultHost, defaultPort, defaultPortalVersion);
 }
 
-function configureInstance(defaultName, defaultUserName, defaultPassword, defaultDomain, defaultPort, defaultPortalVersion) {
+function configureInstance(defaultName, defaultUserName, defaultPassword, defaultHost, defaultPort, defaultPortalVersion) {
 	var questions = [];
 
 	if (defaultName != 'default') {
@@ -76,8 +76,8 @@ function configureInstance(defaultName, defaultUserName, defaultPassword, defaul
 
 	var domainQuestion = {
 		name: 'domain',
-		message: 'Domain?',
-		default: defaultDomain
+		message: 'Host?',
+		default: defaultHost
 	};
 
 	questions.push(domainQuestion);

@@ -7,7 +7,7 @@ function Action(actionPath, payload) {
 		'http://',
 		config.username + ':',
 		config.password + '@',
-		config.domain + ':',
+		config.host + ':',
 		config.port + '/api/jsonws'
 	].join('');
 
