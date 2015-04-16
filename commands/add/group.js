@@ -2,8 +2,9 @@
 
 var async = require('async');
 
-var actions = require('../../lib/actions');
 var utils = require('../../lib/utils');
+
+var actions = utils.getActions();
 
 function addGroup(numberOfGroups) {
 	var bar = utils.getProgressBar(numberOfGroups);

@@ -3,9 +3,10 @@
 var _ = require('lodash');
 var async = require('async');
 
-var actions = require('../../lib/actions');
 var getUserActionRouter = require('../../method-routers/get-user-router');
 var utils = require('../../lib/utils');
+
+var actions = utils.getActions();
 
 function getUser(userInfo) {
 	if (userInfo.length) {

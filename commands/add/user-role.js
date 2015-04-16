@@ -2,10 +2,11 @@
 
 var async = require('async');
 
-var actions = require('../../lib/actions');
 var getRoleActionRouter = require('../../method-routers/get-role-router');
 var getUserActionRouter = require('../../method-routers/get-user-router');
 var utils = require('../../lib/utils');
+
+var actions = utils.getActions();
 
 var userFn;
 var roleFn;

@@ -5,7 +5,7 @@ var program = require('commander');
 
 program
 	.command('user [userInfo...]')
-	.alias('users')
+	.alias('u')
 	.description('Gets one or more users from the database. If no user info is provided, it will return all users.')
 	.action(function(userInfo) {
 		require('./get/user')(userInfo);
@@ -13,7 +13,7 @@ program
 
 program
 	.command('role <roleInfo...>')
-	.alias('roles')
+	.alias('u')
 	.description('Gets one or more roles from the database. Role id or name is required.')
 	.action(function(roleInfo) {
 		require('./get/role')(roleInfo);
