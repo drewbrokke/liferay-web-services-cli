@@ -1,4 +1,4 @@
-var Action = require('../actionClass');
+var Action = require('../lib/actionClass');
 
 module.exports = function(screenName, callback) {
 	var payload = {

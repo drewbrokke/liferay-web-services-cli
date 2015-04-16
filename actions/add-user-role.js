@@ -1,4 +1,4 @@
-var Action = require('../actionClass');
+var Action = require('../lib/actionClass');
 
 module.exports = function(userId, roleIds, callback) {
 	var userRole = {
