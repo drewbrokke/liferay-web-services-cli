@@ -11,9 +11,8 @@ if (!fs.existsSync(userhome('.lws.json'))) {
 
 program
 	.version(require('../package.json').version)
-	.command('add', 'Add an object to the database.\n\t\t   Can be called with arguments (user, role, site, etc.), or can be called on its own for an interactive adding process.\n')
-	.command('gu <userInfo>', 'get-user | Gets a user from the database based on userId, screenName, or emailAddress.')
-	.command('gr <roleInfo>', 'get-role | Gets a role from the database based on roleId or roleName.')
+	.command('add', 'Add an object to the database.  Can be called with arguments (user, role, site, etc.), or can be called on its own for an interactive adding process.\n')
+	.command('get', 'Get an object from the database.  Can be called with arguments (user, role, site, etc.), or can be called on its own for an interactive getting process.\n')
 	.command('config', 'Configure LWS.');
 
 // Some logic that searches global dirs and finds modules

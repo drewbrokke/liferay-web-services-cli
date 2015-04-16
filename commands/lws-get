@@ -1,0 +1,31 @@
+#!/usr/bin/env node
+
+var _ = require('lodash');
+var program = require('commander');
+
+program.parse(process.argv);
+
+var args = program.args;
+
+var number = _.find(args, function(arg) {
+	return !_.isNaN(parseInt(arg, 10));
+});
+
+number = parseInt(number, 10) || 1;
+
+function hasArg(arg) {
+	return _.includes(args, arg) || _.includes(args, arg + 's');
+}
+
+function subArgs(command) {
+	return _.reject(args, function(arg) {
+		return _.includes(arg, command);
+	})
+}
+
+if (hasArg('user')) {
+	require('./get/user')(subArgs('user'));
+}
+else if (hasArg('role')) {
+	require('./get/role')(subArgs('role'));
+}
