@@ -14,7 +14,7 @@ program
 program
 	.command('role <roleInfo...>')
 	.alias('roles')
-	.description('Gets one or more roles from the database. If no role info is provided, it will return all roles.')
+	.description('Gets one or more roles from the database. Role id or name is required.')
 	.action(function(roleInfo) {
 		require('./get/role')(roleInfo);
 	});

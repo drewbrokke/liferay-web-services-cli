@@ -7,7 +7,6 @@ var getRoleActionRouter = require('../../method-routers/get-role-router');
 var utils = require('../../lib/utils');
 
 function getRole(roleInfo) {
-
 	if (!roleInfo.length) {
 		console.error('Please provide role info.');
 	}
