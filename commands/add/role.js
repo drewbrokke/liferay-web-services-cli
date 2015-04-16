@@ -1,31 +1,10 @@
 #!/usr/bin/env node
 
-var _ = require('lodash');
 var async = require('async');
-var program = require('commander');
 var utils = require('../../lib/utils');
 var addRoleAction = require('../../actions/add-role.js');
 
-program
-	.option('-t, --type <type>', 'The type of role. Uses integer value. Defaults to 1.', Number, 1)
-	.parse(process.argv);
-
-var args = program.args;
-
-function hasArg(arg) {
-	return _.includes(args, arg);
-}
-
-var type = program.type;
-
-if (hasArg('site')) {
-	type = 2;
-}
-if (hasArg('organization') || hasArg('org')) {
-	type = 3;
-}
-
-function addRole(numberOfRoles) {
+function addRole(numberOfRoles, type) {
 	var roles = [];
 	var bar = utils.getProgressBar(numberOfRoles);
 

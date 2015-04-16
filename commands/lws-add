@@ -24,7 +24,16 @@ else if (hasArg('user')) {
 	require('./add/user')(number);
 }
 else if (hasArg('role')) {
-	require('./add/role')(number);
+	var type = 1;
+
+	if (hasArg('site')) {
+		type = 2;
+	}
+	if (hasArg('organization') || hasArg('org')) {
+		type = 3;
+	}
+
+	require('./add/role')(number, type);
 }
 else if (hasArg('group') || hasArg('site')) {
 	require('./add/group')(number);
