@@ -2,10 +2,11 @@
 
 var _ = require('lodash');
 var async = require('async');
-var utils = require('../../lib/utils');
 
-var getUserAction = require('../../actions/get-company-users');
+var actions = require('../../lib/actions');
+var getUserAction = actions.getCompanyUsers;
 var getUserActionRouter = require('../../method-routers/get-user-router');
+var utils = require('../../lib/utils');
 
 function getUser(userInfo) {
 	if (userInfo.length) {
@@ -15,7 +16,7 @@ function getUser(userInfo) {
 			function(n, asyncCallback) {
 				var getUserAction = getUserActionRouter(userInfo[n]);
 
-				require(getUserAction)(userInfo[n], function(error, response) {
+				actions[getUserAction](userInfo[n], function(error, response) {
 					if (!error) {
 						asyncCallback(null, response);
 					}

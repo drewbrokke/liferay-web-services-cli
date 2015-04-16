@@ -2,12 +2,10 @@
 
 var async = require('async');
 
+var actions = require('../../lib/actions');
 var getRoleActionRouter = require('../../method-routers/get-role-router');
 var getUserActionRouter = require('../../method-routers/get-user-router');
 var utils = require('../../lib/utils');
-var addUserAction = require('../../actions/add-user');
-var addRoleAction = require('../../actions/add-role');
-var addUserRoleAction = require('../../actions/add-user-role');
 
 var userFn;
 var roleFn;
@@ -30,7 +28,7 @@ function addUserRole(userInfo, roleInfo) {
 		var person = utils.generateUserInfo();
 
 		userFn = function(asyncCallback) {
-			addUserAction(
+			actions.addUser(
 				person.firstName,
 				person.lastName,
 				person.screenName,
@@ -69,7 +67,7 @@ function addUserRole(userInfo, roleInfo) {
 		var name = utils.generateRoleName(type);
 
 		roleFn = function(asyncCallback) {
-			addRoleAction(
+			actions.addRole(
 				name,
 				type,
 				function(error, response) {
@@ -96,7 +94,7 @@ function addUserRole(userInfo, roleInfo) {
 
 			roleIds.push(role.roleId);
 
-			addUserRoleAction(user.userId, roleIds, function(error, response) {
+			actions.addUserRole(user.userId, roleIds, function(error, response) {
 				if (!error) {
 					console.log('Assigned role %j to user %j', role.name, user.firstName + ' ' + user.lastName);
 				}

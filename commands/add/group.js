@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
 var async = require('async');
+
+var actions = require('../../lib/actions');
 var utils = require('../../lib/utils');
 
 function addGroup(numberOfGroups) {
@@ -14,7 +16,7 @@ function addGroup(numberOfGroups) {
 		function(n, callback) {
 			var groupName = utils.generateGroupName();
 
-			require('../../actions/add-group.js')(groupName, function(error, response) {
+			actions.addGroup(groupName, function(error, response) {
 				if (!error) {
 					bar.tick();
 					callback(null, response);

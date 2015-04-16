@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
 var async = require('async');
+
+var actions = require('../../lib/actions');
 var utils = require('../../lib/utils');
-var addRoleAction = require('../../actions/add-role.js');
 
 function addRole(numberOfRoles, type) {
 	var roles = [];
@@ -13,7 +14,7 @@ function addRole(numberOfRoles, type) {
 		function(n, callback) {
 			var name = utils.generateRoleName(type);
 
-			addRoleAction(name, type, function(error, response) {
+			actions.addRole(name, type, function(error, response) {
 				if (!error) {
 					bar.tick();
 					callback(null, response);

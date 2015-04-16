@@ -1,25 +1,19 @@
 #!/usr/bin/env node
 
 function routeGetUserAction(input) {
-	var actionURL;
-
-	var infoTypeActions = {
-		id: '../../actions/get-user-by-id',
-		screenName: '../../actions/get-user-by-screen-name',
-		email: '../../actions/get-user-by-email-address'
-	}
+	var actionName;
 
 	if (!isNaN(parseInt(input, 10))) {
-		actionURL = infoTypeActions.id;
+		actionName = 'getUserById';
 	}
 	else if (input.indexOf('@') != -1) {
-		actionURL = infoTypeActions.email;
+		actionName = 'getUserByEmailAddress';
 	}
 	else {
-		actionURL = infoTypeActions.screenName;
+		actionName = 'getUserByScreenName';
 	}
 
-	return actionURL;
+	return actionName;
 }
 
 module.exports = routeGetUserAction;

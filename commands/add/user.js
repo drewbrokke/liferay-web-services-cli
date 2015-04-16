@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 
 var async = require('async');
-var utils = require('../../lib/utils');
+
+var actions = require('../../lib/actions');
 var addUserAction = require('../../actions/add-user.js');
+var utils = require('../../lib/utils');
 
 function addUser(numberOfUsers) {
 	var users = [];
@@ -15,7 +17,7 @@ function addUser(numberOfUsers) {
 		function(n, callback) {
 			var person = utils.generateUserInfo();
 
-			addUserAction(person.firstName, person.lastName, person.screenName, person.emailAddress, function(error, response) {
+			actions.addUser(person.firstName, person.lastName, person.screenName, person.emailAddress, function(error, response) {
 				if (!error) {
 					bar.tick();
 					callback(null, response);

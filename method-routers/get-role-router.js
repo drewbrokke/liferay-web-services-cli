@@ -1,21 +1,16 @@
 #!/usr/bin/env node
 
 function routeGetRoleAction(input) {
-	var actionURL;
-
-	var infoTypeActions = {
-		id: '../../actions/get-role-by-id',
-		name: '../../actions/get-role-by-name'
-	}
+	var actionName;
 
 	if (!isNaN(parseInt(input, 10))) {
-		actionURL = infoTypeActions.id;
+		actionName = 'getRoleById';
 	}
 	else {
-		actionURL = infoTypeActions.name;
+		actionName = 'getRoleByName';
 	}
 
-	return actionURL;
+	return actionName;
 }
 
 module.exports = routeGetRoleAction;

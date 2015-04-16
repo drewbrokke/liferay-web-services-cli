@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
 var async = require('async');
+
+var actions = require('../../lib/actions');
 var utils = require('../../lib/utils');
 
 function addLayout(numberOfLayouts, groupId, parentLayoutId) {
@@ -16,7 +18,7 @@ function addLayout(numberOfLayouts, groupId, parentLayoutId) {
 		function(n, callback) {
 			var layoutName = layoutNameBase + ' ' + n;
 
-			require('../../actions/add-layout.js')(groupId, layoutName, parentLayoutId, function(error, response) {
+			actions.addLayout(groupId, layoutName, parentLayoutId, function(error, response) {
 				if (!error) {
 					bar.tick();
 					callback(null, response);
