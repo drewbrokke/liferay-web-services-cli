@@ -4,7 +4,6 @@ var _ = require('lodash');
 var async = require('async');
 
 var actions = require('../../lib/actions');
-var getUserAction = actions.getCompanyUsers;
 var getUserActionRouter = require('../../method-routers/get-user-router');
 var utils = require('../../lib/utils');
 
@@ -36,7 +35,7 @@ function getUser(userInfo) {
 	}
 	else {
 		// Get all users in the company
-		getUserAction(function(error, response) {
+		actions.getCompanyUsers(function(error, response) {
 			if (!error) {
 				var users = JSON.parse(response);
 

@@ -3,7 +3,6 @@
 var async = require('async');
 
 var actions = require('../../lib/actions');
-var addUserAction = require('../../actions/add-user.js');
 var utils = require('../../lib/utils');
 
 function addUser(numberOfUsers) {
