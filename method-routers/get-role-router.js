@@ -4,8 +4,8 @@ function routeGetRoleAction(input) {
 	var actionURL;
 
 	var infoTypeActions = {
-		id: '../actions/get-role-by-id',
-		name: '../actions/get-role-by-name'
+		id: '../../actions/get-role-by-id',
+		name: '../../actions/get-role-by-name'
 	}
 
 	if (!isNaN(parseInt(input, 10))) {

@@ -1,0 +1,34 @@
+#!/usr/bin/env node
+
+var _ = require('lodash');
+var program = require('commander');
+
+program.parse(process.argv);
+
+var args = program.args;
+
+var number = _.find(args, function(arg) {
+	return !_.isNaN(parseInt(arg, 10));
+});
+
+number = parseInt(number, 10) || 1;
+
+function hasArg(arg) {
+	return _.includes(args, arg) || _.includes (args, arg + 's');
+}
+
+if (hasArg('user') && hasArg('role')) {
+	require('./add/user-role')(number);
+}
+else if (hasArg('user')) {
+	require('./add/user')(number);
+}
+else if (hasArg('role')) {
+	require('./add/role')(number);
+}
+else if (hasArg('group') || hasArg('site')) {
+	require('./add/group')(number);
+}
+else if (hasArg('layout') || hasArg('page')) {
+	require('./add/layout')(number);
+}
