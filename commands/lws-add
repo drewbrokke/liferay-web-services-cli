@@ -3,41 +3,64 @@
 var _ = require('lodash');
 var program = require('commander');
 
+program
+	.command('user [quantity]')
+	.alias('users')
+	.description('Adds one or more users to the database.')
+	.action(function(number) {
+		number = !_.isNaN(Number(number)) ? Number(number) : 1;
+		require('./add/user')(number);
+	});
+
+program
+	.command('role [quantity]')
+	.alias('roles')
+	.option('-t, --type <type>', 'Type of role to add. Accepts "site" or "organization". Defaults to "regular".')
+	.description('Adds one or more roles to the database. Number of role can be defined before or after.')
+	.action(function(number) {
+		var type = this.type;
+
+		number = !_.isNaN(Number(number)) ? Number(number) : 1;
+
+		if (type === 'site') {
+			type = 2;
+		}
+		else if (type === 'organization' || type === 'org') {
+			type = 3;
+		}
+		else {
+			type = 1;
+		}
+		require('./add/role')(number, type);
+	});
+
+program
+	.command('user-role')
+	.option('-u, --userInfo <userInfo>', 'User id to add a role to.')
+	.option('-r, --roleInfo <roleInfo>', 'The role id to add to the user.')
+	.action(function() {
+		require('./add/user-role')(this.userInfo, this.roleInfo)
+	});
+
+program
+	.command('site [quantity]')
+	.alias('sites')
+	.description('Adds one or more sites to the database. Number of sites can be defined before or after.')
+	.action(function(number) {
+		number = !_.isNaN(Number(number)) ? Number(number) : 1;
+
+		require('./add/group')(number);
+	});
+
+program
+	.command('page [quantity]')
+	.alias('pages')
+	.option('-g, --groupId <integer>', 'The groupId to add the pages to. Defaults to the ID of the guest site.', Number, 20181)
+	.option('-p, --parentLayoutId <integer>', 'The parent page ID to add the pages to. Defaults to 0.', Number, 0)
+	.description('Adds one or more pages to the database. Number of pages can be defined before or after.')
+	.action(function(number) {
+		number = !_.isNaN(Number(number)) ? Number(number) : 1;
+		require('./add/layout')(number, this.groupId, this.parentLayoutId);
+	});
+
 program.parse(process.argv);
-
-var args = program.args;
-
-var number = _.find(args, function(arg) {
-	return !_.isNaN(parseInt(arg, 10));
-});
-
-number = parseInt(number, 10) || 1;
-
-function hasArg(arg) {
-	return _.includes(args, arg) || _.includes (args, arg + 's');
-}
-
-if (hasArg('user') && hasArg('role')) {
-	require('./add/user-role')(number);
-}
-else if (hasArg('user')) {
-	require('./add/user')(number);
-}
-else if (hasArg('role')) {
-	var type = 1;
-
-	if (hasArg('site')) {
-		type = 2;
-	}
-	if (hasArg('organization') || hasArg('org')) {
-		type = 3;
-	}
-
-	require('./add/role')(number, type);
-}
-else if (hasArg('group') || hasArg('site')) {
-	require('./add/group')(number);
-}
-else if (hasArg('layout') || hasArg('page')) {
-	require('./add/layout')(number);
-}
