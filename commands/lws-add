@@ -5,7 +5,7 @@ var program = require('commander');
 
 program
 	.command('user [quantity]')
-	.alias('users')
+	.alias('u')
 	.description('Adds one or more users to the database.')
 	.action(function(number) {
 		number = !_.isNaN(Number(number)) ? Number(number) : 1;
@@ -14,9 +14,9 @@ program
 
 program
 	.command('role [quantity]')
-	.alias('roles')
-	.option('-t, --type <type>', 'Type of role to add. Accepts "site" or "organization". Defaults to "regular".')
+	.alias('r')
 	.description('Adds one or more roles to the database. Number of role can be defined before or after.')
+	.option('-t, --type <type>', 'Type of role to add. Accepts "site" or "organization". Defaults to "regular".')
 	.action(function(number) {
 		var type = this.type;
 
@@ -36,6 +36,8 @@ program
 
 program
 	.command('user-role')
+	.alias('ur')
+	.description('Assign a role to a user. If called with no arguments, it will create a new role and user.')
 	.option('-u, --userInfo <userInfo>', 'User id to add a role to.')
 	.option('-r, --roleInfo <roleInfo>', 'The role id to add to the user.')
 	.action(function() {
@@ -44,7 +46,7 @@ program
 
 program
 	.command('site [quantity]')
-	.alias('sites')
+	.alias('s')
 	.description('Adds one or more sites to the database. Number of sites can be defined before or after.')
 	.action(function(number) {
 		number = !_.isNaN(Number(number)) ? Number(number) : 1;
@@ -54,7 +56,7 @@ program
 
 program
 	.command('page [quantity]')
-	.alias('pages')
+	.alias('p')
 	.option('-g, --groupId <integer>', 'The groupId to add the pages to. Defaults to the ID of the guest site.', Number, 20181)
 	.option('-p, --parentLayoutId <integer>', 'The parent page ID to add the pages to. Defaults to 0.', Number, 0)
 	.description('Adds one or more pages to the database. Number of pages can be defined before or after.')
