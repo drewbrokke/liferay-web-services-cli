@@ -38,6 +38,17 @@ npm install -g liferay-web-services-cli
 lws <command> [options]
 ```
 
+**Note:**
+If after updating you are getting an error like this one:
+```
+ERROR:  { [Error: getaddrinfo ENOTFOUND undefined]
+  code: 'ENOTFOUND',
+  errno: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'undefined' }
+```
+Simply delete `~/.lws.json` or edit it and change all the `domain` keys to `host` (e.g. `"domain": "localhost"` changes to `"host": "localhost"`).
+
 **Examples:**
 ```
 # Adds a new user
