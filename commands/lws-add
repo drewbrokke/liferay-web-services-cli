@@ -15,7 +15,7 @@ program
 program
 	.command('role [quantity]')
 	.alias('r')
-	.description('Adds one or more roles to the database. Number of role can be defined before or after.')
+	.description('Adds one or more roles to the database.')
 	.option('-t, --type <type>', 'Type of role to add. Accepts "site" or "organization". Defaults to "regular".')
 	.action(function(number) {
 		var type = this.type;
@@ -47,7 +47,7 @@ program
 program
 	.command('site [quantity]')
 	.alias('s')
-	.description('Adds one or more sites to the database. Number of sites can be defined before or after.')
+	.description('Adds one or more sites to the database.')
 	.action(function(number) {
 		number = !_.isNaN(Number(number)) ? Number(number) : 1;
 
@@ -59,7 +59,7 @@ program
 	.alias('p')
 	.option('-g, --groupId <integer>', 'The groupId to add the pages to. Defaults to the ID of the guest site.', Number, 20181)
 	.option('-p, --parentLayoutId <integer>', 'The parent page ID to add the pages to. Defaults to 0.', Number, 0)
-	.description('Adds one or more pages to the database. Number of pages can be defined before or after.')
+	.description('Adds one or more pages to the database.')
 	.action(function(number) {
 		number = !_.isNaN(Number(number)) ? Number(number) : 1;
 		require('./add/layout')(number, this.groupId, this.parentLayoutId);
@@ -69,7 +69,7 @@ program
 	.command('organization [quantity]')
 	.alias('o')
 	.option('-p, --parentOrganizationId <integer>', 'The parent organization ID to add the organization to. Defaults to 0.', Number, 0)
-	.description('Adds one or more organizations to the database. Number of organizations can be defined before or after.')
+	.description('Adds one or more organizations to the database.')
 	.action(function(number) {
 		number = !_.isNaN(Number(number)) ? Number(number) : 1;
 		require('./add/organization')(number, this.parentOrganizationId);
