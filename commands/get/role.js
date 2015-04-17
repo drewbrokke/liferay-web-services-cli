@@ -2,10 +2,10 @@
 
 var async = require('async');
 
-var getRoleActionRouter = require('../../method-routers/get-role-router');
 var utils = require('../../lib/utils');
 
 var actions = utils.getActions();
+var methodRouters = utils.getMethodRouters();
 
 function getRole(roleInfo) {
 	if (!roleInfo.length) {
@@ -15,7 +15,7 @@ function getRole(roleInfo) {
 	async.timesSeries(
 		roleInfo.length,
 		function(n, asyncCallback) {
-			var getRoleAction = getRoleActionRouter(roleInfo[n]);
+			var getRoleAction = methodRouters.getRoleRouter(roleInfo[n]);
 
 			actions[getRoleAction](roleInfo[n], function(error, response) {
 				if (!error) {

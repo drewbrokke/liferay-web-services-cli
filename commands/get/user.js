@@ -3,10 +3,10 @@
 var _ = require('lodash');
 var async = require('async');
 
-var getUserActionRouter = require('../../method-routers/get-user-router');
 var utils = require('../../lib/utils');
 
 var actions = utils.getActions();
+var methodRouters = utils.getMethodRouters();
 
 function getUser(userInfo) {
 	if (userInfo.length) {
@@ -14,7 +14,7 @@ function getUser(userInfo) {
 		async.timesSeries(
 			userInfo.length,
 			function(n, asyncCallback) {
-				var getUserAction = getUserActionRouter(userInfo[n]);
+				var getUserAction = methodRouters.getUserRouter(userInfo[n]);
 
 				actions[getUserAction](userInfo[n], function(error, response) {
 					if (!error) {

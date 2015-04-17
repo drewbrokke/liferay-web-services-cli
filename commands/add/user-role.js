@@ -2,11 +2,10 @@
 
 var async = require('async');
 
-var getRoleActionRouter = require('../../method-routers/get-role-router');
-var getUserActionRouter = require('../../method-routers/get-user-router');
 var utils = require('../../lib/utils');
 
 var actions = utils.getActions();
+var methodRouters = utils.getMethodRouters();
 
 var userFn;
 var roleFn;
@@ -14,10 +13,10 @@ var roleFn;
 function addUserRole(userInfo, roleInfo) {
 	if (userInfo) {
 		// Get User
-		var getUserAction = getUserActionRouter(userInfo);
+		var getUserAction = methodRouters.getUserRouter(userInfo);
 
 		userFn = function(asyncCallback) {
-			require(getUserAction)(userInfo, function(error, response) {
+			actions[getUserAction](userInfo, function(error, response) {
 				if (!error) {
 					asyncCallback(null, JSON.parse(response));
 				}
@@ -52,10 +51,10 @@ function addUserRole(userInfo, roleInfo) {
 
 	if (roleInfo) {
 		// Get Role
-		var getRoleAction = getRoleActionRouter(roleInfo);
+		var getRoleAction = methodRouters.getRoleRouter(roleInfo);
 
 		roleFn = function(asyncCallback) {
-			require(getRoleAction)(roleInfo, function(error, response) {
+			actions[getRoleAction](roleInfo, function(error, response) {
 				if (!error) {
 					asyncCallback(null, JSON.parse(response));
 				}

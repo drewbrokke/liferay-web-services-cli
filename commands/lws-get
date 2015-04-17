@@ -13,7 +13,7 @@ program
 
 program
 	.command('role <roleInfo...>')
-	.alias('u')
+	.alias('r')
 	.description('Gets one or more roles from the database. Role id or name is required.')
 	.action(function(roleInfo) {
 		require('./get/role')(roleInfo);
