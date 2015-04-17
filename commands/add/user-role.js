@@ -7,107 +7,59 @@ var utils = require('../../lib/utils');
 var actions = utils.getActions();
 var methodRouters = utils.getMethodRouters();
 
-var userFn;
-var roleFn;
-
 function addUserRole(userInfo, roleInfo, callback) {
-	if (userInfo) {
-		// Get User
-		var getUserAction = methodRouters.getUserRouter(userInfo);
-
-		userFn = function(asyncCallback) {
-			actions[getUserAction](userInfo, function(error, response) {
-				if (!error) {
-					asyncCallback(null, JSON.parse(response));
-				}
-			});
-		}
+	if (!userInfo) {
+		console.error('No user information provided');
 	}
-	else {
-		// Add User
-		var person = utils.generateUserInfo();
 
-		userFn = function(asyncCallback) {
-			actions.addUser(
-				person.firstName,
-				person.lastName,
-				person.screenName,
-				person.emailAddress,
-				function(error, response) {
+	if (!roleInfo) {
+		console.error('No role information provided');
+	}
+
+	var getUserAction = methodRouters.getUserRouter(userInfo);
+	var getRoleAction = methodRouters.getRoleRouter(roleInfo);
+
+	function getUser(asyncCallback) {
+		actions[getUserAction](userInfo, function(error, response) {
+			if (!error) {
+				asyncCallback(null, JSON.parse(response));
+			}
+		});
+	}
+
+	function getRole(asyncCallback) {
+		actions[getRoleAction](roleInfo, function(error, response) {
+			if (!error) {
+				asyncCallback(null, JSON.parse(response));
+			}
+		});
+	}
+
+	async.parallel(
+		[getUser, getRole],
+		function(error, results) {
+			if (!error) {
+				var user = results[0];
+				var role = results[1];
+				var roleIds = [];
+
+				roleIds.push(role.roleId);
+
+				actions.addUserRole(user.userId, roleIds, function(error, response) {
 					if (!error) {
-						var user = JSON.parse(response);
-
-						console.log('');
-						console.log('Added User:');
-						utils.printJSON(user);
-						console.log('');
-
-						asyncCallback(null, user);
+						console.log('Assigned role %j to user %j', role.name, user.firstName + ' ' + user.lastName);
 					}
+				});
+
+				if (callback) {
+					callback(null, results);
 				}
-			);
-		}
-	}
-
-	if (roleInfo) {
-		// Get Role
-		var getRoleAction = methodRouters.getRoleRouter(roleInfo);
-
-		roleFn = function(asyncCallback) {
-			actions[getRoleAction](roleInfo, function(error, response) {
-				if (!error) {
-					asyncCallback(null, JSON.parse(response));
-				}
-			});
-		}
-	}
-	else {
-		// Add Role
-		var type = 1;
-		var name = utils.generateRoleName(type);
-
-		roleFn = function(asyncCallback) {
-			actions.addRole(
-				name,
-				type,
-				function(error, response) {
-					if (!error) {
-						var role = JSON.parse(response);
-
-						console.log('');
-						console.log('Added Role:');
-						utils.printJSON(role);
-						console.log('');
-
-						asyncCallback(null, role);
-					}
-				}
-			);
-		}
-	}
-
-	async.parallel([userFn, roleFn], function(error, results) {
-		if (!error) {
-			var user = results[0];
-			var role = results[1];
-			var roleIds = [];
-
-			roleIds.push(role.roleId);
-
-			actions.addUserRole(user.userId, roleIds, function(error, response) {
-				if (!error) {
-					console.log('Assigned role %j to user %j', role.name, user.firstName + ' ' + user.lastName);
-				}
-			});
-
-			if (callback) {
-				callback(null, results);
+			}
+			else {
+				console.error(error);
 			}
 		}
-		else {
-			console.error(error);
-		}
-	});
+	);
 }
 
 module.exports = addUserRole;

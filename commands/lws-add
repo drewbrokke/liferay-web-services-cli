@@ -1,7 +1,17 @@
 #!/usr/bin/env node
 
 var _ = require('lodash');
+var async = require('async');
 var program = require('commander');
+
+var commands = {
+	addGroup: require('./add/user'),
+	addLayout: require('./add/layout'),
+	addOrganization: require('./add/organization'),
+	addRole: require('./add/role'),
+	addUserRole: require('./add/user-role'),
+	addUser: require('./add/user')
+}
 
 program
 	.command('user [quantity]')
@@ -9,7 +19,7 @@ program
 	.description('Adds one or more users to the database.')
 	.action(function(number) {
 		number = !_.isNaN(Number(number)) ? Number(number) : 1;
-		require('./add/user')(number);
+		commands.addUser(number);
 	});
 
 program
@@ -31,17 +41,7 @@ program
 		else {
 			type = 1;
 		}
-		require('./add/role')(number, type);
-	});
-
-program
-	.command('user-role')
-	.alias('ur')
-	.description('Assign a role to a user. If called with no arguments, it will create a new role and user.')
-	.option('-u, --userInfo <userInfo>', 'User id to add a role to.')
-	.option('-r, --roleInfo <roleInfo>', 'The role id to add to the user.')
-	.action(function() {
-		require('./add/user-role')(this.userInfo, this.roleInfo)
+		commands.addRole(number, type);
 	});
 
 program
@@ -51,7 +51,7 @@ program
 	.action(function(number) {
 		number = !_.isNaN(Number(number)) ? Number(number) : 1;
 
-		require('./add/group')(number);
+		commands.addGroup(number);
 	});
 
 program
@@ -62,7 +62,7 @@ program
 	.description('Adds one or more pages to the database.')
 	.action(function(number) {
 		number = !_.isNaN(Number(number)) ? Number(number) : 1;
-		require('./add/layout')(number, this.groupId, this.parentLayoutId);
+		commands.addLayout(number, this.groupId, this.parentLayoutId);
 	});
 
 program
@@ -72,7 +72,46 @@ program
 	.description('Adds one or more organizations to the database.')
 	.action(function(number) {
 		number = !_.isNaN(Number(number)) ? Number(number) : 1;
-		require('./add/organization')(number, this.parentOrganizationId);
+		commands.addOrganization(number, this.parentOrganizationId);
+	});
+
+program
+	.command('user-role')
+	.alias('ur')
+	.description('Assign a role to a user. If called with no arguments, it will create a new role and user.')
+	.option('-u, --userInfo <userInfo>', 'User id to add a role to.')
+	.option('-r, --roleInfo <roleInfo>', 'The role id to add to the user.')
+	.action(function() {
+		var userInfo = this.userInfo;
+		var roleInfo = this.roleInfo;
+
+		var tasks = [];
+
+		if (!userInfo) {
+			function addUser(asyncCallback) {
+				commans.addUser(1, function(error, results) {
+					userInfo = JSON.parse(results[0]).userId;
+					asyncCallback();
+				});
+			}
+
+			tasks.push(addUser);
+		}
+
+		if (!roleInfo) {
+			function addRole(asyncCallback) {
+				commands.addRole(1, 1, function(error, results) {
+					roleInfo = JSON.parse(results[0]).roleId;
+					asyncCallback();
+				});
+			}
+
+			tasks.push(addRole);
+		}
+
+		async.series(tasks, function() {
+			commands.addUserRole(userInfo, roleInfo);
+		});
 	});
 
 program.parse(process.argv);
