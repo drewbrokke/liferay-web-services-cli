@@ -6,7 +6,7 @@ var utils = require('../../lib/utils');
 
 var actions = utils.getActions();
 
-function addGroup(numberOfGroups) {
+function addGroup(numberOfGroups, callback) {
 	var bar = utils.getProgressBar(numberOfGroups);
 	var groups = [];
 
@@ -14,13 +14,13 @@ function addGroup(numberOfGroups) {
 
 	async.timesSeries(
 		numberOfGroups,
-		function(n, callback) {
+		function(n, asyncCallback) {
 			var groupName = utils.generateGroupName();
 
 			actions.addGroup(groupName, function(error, response) {
 				if (!error) {
 					bar.tick();
-					callback(null, response);
+					asyncCallback(null, response);
 				}
 			});
 		},
@@ -34,6 +34,10 @@ function addGroup(numberOfGroups) {
 				}
 
 				console.log('Successfully added', + results.length + ' new groups.');
+
+				if (callback) {
+					callback(null, results);
+				}
 			}
 		}
 	);

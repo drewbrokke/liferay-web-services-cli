@@ -10,7 +10,7 @@ var methodRouters = utils.getMethodRouters();
 var userFn;
 var roleFn;
 
-function addUserRole(userInfo, roleInfo) {
+function addUserRole(userInfo, roleInfo, callback) {
 	if (userInfo) {
 		// Get User
 		var getUserAction = methodRouters.getUserRouter(userInfo);
@@ -99,6 +99,10 @@ function addUserRole(userInfo, roleInfo) {
 					console.log('Assigned role %j to user %j', role.name, user.firstName + ' ' + user.lastName);
 				}
 			});
+
+			if (callback) {
+				callback(null, results);
+			}
 		}
 		else {
 			console.error(error);

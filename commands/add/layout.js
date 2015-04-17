@@ -6,7 +6,7 @@ var utils = require('../../lib/utils');
 
 var actions = utils.getActions();
 
-function addLayout(numberOfLayouts, groupId, parentLayoutId) {
+function addLayout(numberOfLayouts, groupId, parentLayoutId, callback) {
 	var layouts = [];
 	var layoutNameBase = utils.generateLayoutName();
 
@@ -16,13 +16,13 @@ function addLayout(numberOfLayouts, groupId, parentLayoutId) {
 
 	async.timesSeries(
 		numberOfLayouts,
-		function(n, callback) {
+		function(n, asyncCallback) {
 			var layoutName = layoutNameBase + ' ' + n;
 
 			actions.addLayout(groupId, layoutName, parentLayoutId, function(error, response) {
 				if (!error) {
 					bar.tick();
-					callback(null, response);
+					asyncCallback(null, response);
 				}
 			});
 		},
@@ -36,6 +36,10 @@ function addLayout(numberOfLayouts, groupId, parentLayoutId) {
 				}
 
 				console.log('Successfully added', + results.length + ' new groups.');
+
+				if (callback) {
+					callback(null, results);
+				}
 			}
 		}
 	);

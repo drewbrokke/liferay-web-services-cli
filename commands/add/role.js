@@ -6,19 +6,19 @@ var utils = require('../../lib/utils');
 
 var actions = utils.getActions();
 
-function addRole(numberOfRoles, type) {
+function addRole(numberOfRoles, type, callback) {
 	var roles = [];
 	var bar = utils.getProgressBar(numberOfRoles);
 
 	async.timesSeries(
 		numberOfRoles,
-		function(n, callback) {
+		function(n, asyncCallback) {
 			var name = utils.generateRoleName(type);
 
 			actions.addRole(name, type, function(error, response) {
 				if (!error) {
 					bar.tick();
-					callback(null, response);
+					asyncCallback(null, response);
 				}
 			});
 		},
@@ -32,6 +32,10 @@ function addRole(numberOfRoles, type) {
 				}
 
 				console.log('Successfully added', + results.length + ' new roles.');
+
+				if (callback) {
+					callback(null, results);
+				}
 			}
 		}
 	);

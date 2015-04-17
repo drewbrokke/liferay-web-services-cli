@@ -6,7 +6,7 @@ var utils = require('../../lib/utils');
 
 var actions = utils.getActions();
 
-function addOrganization(numberOfOrganizations, parentOrganizationId) {
+function addOrganization(numberOfOrganizations, parentOrganizationId, callback) {
 	var bar = utils.getProgressBar(numberOfOrganizations);
 	var organizations = [];
 
@@ -14,13 +14,13 @@ function addOrganization(numberOfOrganizations, parentOrganizationId) {
 
 	async.timesSeries(
 		numberOfOrganizations,
-		function(n, callback) {
+		function(n, asyncCallback) {
 			var organizationName = utils.generateOrganizationName();
 
 			actions.addOrganization(organizationName, function(error, response) {
 				if (!error) {
 					bar.tick();
-					callback(null, response);
+					asyncCallback(null, response);
 				}
 			});
 		},
@@ -34,6 +34,10 @@ function addOrganization(numberOfOrganizations, parentOrganizationId) {
 				}
 
 				console.log('Successfully added', + results.length + ' new organizations.');
+
+				if (callback) {
+					callback(null, results);
+				}
 			}
 		}
 	);

@@ -7,7 +7,7 @@ var utils = require('../../lib/utils');
 var actions = utils.getActions();
 var methodRouters = utils.getMethodRouters();
 
-function getRole(roleInfo) {
+function getRole(roleInfo, callback) {
 	if (!roleInfo.length) {
 		console.error('Please provide role info.');
 	}
@@ -30,6 +30,10 @@ function getRole(roleInfo) {
 					console.log('Got Role:');
 					utils.printJSON(JSON.parse(results[i]));
 					console.log('');
+				}
+
+				if (callback) {
+					callback(null, results);
 				}
 			}
 		}

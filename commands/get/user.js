@@ -8,7 +8,7 @@ var utils = require('../../lib/utils');
 var actions = utils.getActions();
 var methodRouters = utils.getMethodRouters();
 
-function getUser(userInfo) {
+function getUser(userInfo, callback) {
 	if (userInfo.length) {
 		// Get Users from provided info
 		async.timesSeries(
@@ -29,6 +29,10 @@ function getUser(userInfo) {
 						console.log('Got User:');
 						utils.printJSON(JSON.parse(results[i]));
 						console.log('');
+					}
+
+					if (callback) {
+						callback(null, results);
 					}
 				}
 			}

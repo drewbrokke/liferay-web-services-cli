@@ -6,7 +6,7 @@ var utils = require('../../lib/utils');
 
 var actions = utils.getActions();
 
-function addUser(numberOfUsers) {
+function addUser(numberOfUsers, callback) {
 	var users = [];
 	var bar = utils.getProgressBar(numberOfUsers);
 
@@ -14,13 +14,13 @@ function addUser(numberOfUsers) {
 
 	async.timesSeries(
 		numberOfUsers,
-		function(n, callback) {
+		function(n, asyncCallback) {
 			var person = utils.generateUserInfo();
 
 			actions.addUser(person.firstName, person.lastName, person.screenName, person.emailAddress, function(error, response) {
 				if (!error) {
 					bar.tick();
-					callback(null, response);
+					asyncCallback(null, response);
 				}
 			});
 		},
@@ -34,6 +34,10 @@ function addUser(numberOfUsers) {
 				}
 
 				console.log('Successfully added', + results.length + ' new users.');
+
+				if (callback) {
+					callback(null, results);
+				}
 			}
 		}
 	);
