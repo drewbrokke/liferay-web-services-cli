@@ -89,7 +89,7 @@ program
 
 		if (!userInfo) {
 			function addUser(asyncCallback) {
-				commans.addUser(1, function(error, results) {
+				commands.addUser(1, function(error, results) {
 					userInfo = JSON.parse(results[0]).userId;
 					asyncCallback();
 				});
