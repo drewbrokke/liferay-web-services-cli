@@ -65,4 +65,18 @@ program
 		require('./add/layout')(number, this.groupId, this.parentLayoutId);
 	});
 
+program
+	.command('organization [quantity]')
+	.alias('o')
+	.option('-p, --parentOrganizationId <integer>', 'The parent organization ID to add the organization to. Defaults to 0.', Number, 0)
+	.description('Adds one or more organizations to the database. Number of organizations can be defined before or after.')
+	.action(function(number) {
+		number = !_.isNaN(Number(number)) ? Number(number) : 1;
+		require('./add/organization')(number, this.parentOrganizationId);
+	});
+
 program.parse(process.argv);
+
+if (!process.argv.slice(2).length) {
+	program.outputHelp();
+}

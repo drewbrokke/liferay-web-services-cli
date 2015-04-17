@@ -11,8 +11,8 @@ if (!fs.existsSync(userhome('.lws.json'))) {
 
 program
 	.version(require('../package.json').version)
-	.command('add', 'Add an object to the database.  Can be called with arguments (user, role, site, etc.), or can be called on its own for an interactive adding process.\n')
-	.command('get', 'Get an object from the database.  Can be called with arguments (user, role, site, etc.), or can be called on its own for an interactive getting process.\n')
+	.command('add', 'Add an object to the database.')
+	.command('get', 'Get an object from the database.')
 	.command('config', 'Configure LWS.');
 
 // Some logic that searches global dirs and finds modules
