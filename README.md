@@ -1,8 +1,6 @@
 # Liferay Web Services CLI
 A command-line interface for [Liferay's JSON Web Services](https://www.liferay.com/api/jsonws).
 
-This is a VERY early development build, and is really nothing more than a proof-of-concept at the moment. It is written with development, not production, in mind.
-
 It is currently *master only*.
 
 ## What it is (and isn't)
@@ -13,13 +11,22 @@ During development and debugging of the master branch, I got very tired of havin
 
 I mostly wanted to see if I could get that process down to a single command in the shell (success!). This is useful for me personally, but I would like to see broader and more useful functionality added.
 
-I plan on adding more actions:
-- Adding sites, site members, and site pages
-- Adding user groups
-- Adding Organizations and members
-- And hopefully more...
+**Current functionality:**
+- Create users, roles, sites, site pages, and organizations
+- Get a single user or all users' information
+- Get a single role's information
+- Quickly create a user and a role, then assign the role to the user
 
-If you happen to look through the source code and have an idea or suggestion for improvement, please open a Github issue or send a pull request.
+**Todo list:**
+- Compatibility with 6.2.x and 6.1.x
+- Add site members
+- Add user groups
+- Add portlets to pages
+- Interactive mode to manually add a user with specific information rather than generated info
+- Interactively edit and update user and site info
+- Compatibility with a plugin system - devs can add their own commands, actions and workflows.
+
+Please let me know of any actions or features you would find useful.  There's a lot of methods in the JSONWS api, so it may take a while to add all the possible use-cases.  Suggestions help me know where the interest is.  Also, feel free to fork the repo and contribute.
 
 ## Installing
 ```
@@ -34,39 +41,50 @@ lws <command> [options]
 **Examples:**
 ```
 # Adds a new user
-lws au
-
-# Adds x new users
-lws au 20
+lws add user
+lws add u               ('user' is aliased to 'u')
+lws add user 20         (adds 20 users.  You can add as many as you want)
 
 # Gets an existing user
-lws gu 12345 (userId)
-lws gu userScreenName
-lws gu useremail@usermail.com
+lws get user 12345                      (get a user by user id)
+lws get u userScreenName                (get a user by screen name)
+lws get user useremail@usermail.com     (get a user by email address)
+lws get user                            (returns the information for all users)
 
 # Adds a new role
-lws ar
-
-# Adds x new roles
-lws ar 3
-
-# Adds a new role of type 2 (site role)
-lws ar -t 2
+lws add role
+lws add r           ('role' is aliased to 'r')
+lws add role site   (adds a site role)
+lws add r 3         (Adds 3 regular roles)
 
 # Gets an existing role
-lws gr 12345 (roleId)
-lws gr roleName
+lws get role 12345      (roleId)
+lws get role roleName
 
 # Creates a new user, a new role, and assigns the role to the user
-lws aur
+lws add user-role 
+lws add ur          ('user-role' is aliased to 'ur')
 
 # Assigns a specific role to a specific user
 lws aur -u 12345 -r 54321
+
+# And more - 
+lws add site            (aliased to 's')
+lws add page            (aliased to 'p') 
+lws add organization    (aliased to 'o')
+
+# Configure for use with additional instances of portal:
+lws config
+lws config add ee-6.2.x
+lws config use ee-6.2.x
 ```
 
 **Help:**
 ```
+# Help can be accessed per command level
 lws -h
+lws add -h
+lws add page -h
 ```
 
 
