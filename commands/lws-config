@@ -174,7 +174,7 @@ function listInstances() {
 	_.forEach(config.getInstanceConfigs(), function(instance, instanceName) {
 		var appendix = ':';
 
-		if (instanceName === config.getActiveInstanceName()) {
+		if (instanceName === config.getCurrentInstanceName()) {
 			appendix = ' (ACTIVE):'
 		}
 
@@ -207,7 +207,7 @@ function useInstance() {
 	var instanceConfig = config.getInstanceConfig(instanceName);
 
 	if (instanceName && !!instanceConfig) {
-		config.setActiveInstanceConfig(instanceName);
+		config.setCurrentInstanceConfig(instanceName);
 	}
 	else {
 		var useInstanceQuestion = {
@@ -218,7 +218,7 @@ function useInstance() {
 		};
 
 		inquirer.prompt([useInstanceQuestion], function(answers) {
-			config.setActiveInstanceConfig(answers.instanceName);
+			config.setCurrentInstanceConfig(answers.instanceName);
 		});
 	}
 }
