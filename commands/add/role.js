@@ -15,12 +15,16 @@ function addRole(numberOfRoles, type, callback) {
 		function(n, asyncCallback) {
 			var name = utils.generateRoleName(type);
 
-			actions.addRole(name, type, function(error, response) {
-				if (!error) {
-					bar.tick();
-					asyncCallback(null, response);
+			actions.addRole(
+				name,
+				type,
+				function(error, response) {
+					if (!error) {
+						bar.tick();
+						asyncCallback(null, response);
+					}
 				}
-			});
+			);
 		},
 		function(error, results) {
 			if (!error) {

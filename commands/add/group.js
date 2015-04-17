@@ -17,12 +17,15 @@ function addGroup(numberOfGroups, callback) {
 		function(n, asyncCallback) {
 			var groupName = utils.generateGroupName();
 
-			actions.addGroup(groupName, function(error, response) {
-				if (!error) {
-					bar.tick();
-					asyncCallback(null, response);
+			actions.addGroup(
+				groupName,
+				function(error, response) {
+					if (!error) {
+						bar.tick();
+						asyncCallback(null, response);
+					}
 				}
-			});
+			);
 		},
 		function(error, results) {
 			if (!error) {

@@ -17,12 +17,18 @@ function addUser(numberOfUsers, callback) {
 		function(n, asyncCallback) {
 			var person = utils.generateUserInfo();
 
-			actions.addUser(person.firstName, person.lastName, person.screenName, person.emailAddress, function(error, response) {
-				if (!error) {
-					bar.tick();
-					asyncCallback(null, response);
+			actions.addUser(
+				person.firstName,
+				person.lastName,
+				person.screenName,
+				person.emailAddress,
+				function(error, response) {
+					if (!error) {
+						bar.tick();
+						asyncCallback(null, response);
+					}
 				}
-			});
+			);
 		},
 		function(error, results) {
 			if (!error) {

@@ -19,12 +19,17 @@ function addLayout(numberOfLayouts, groupId, parentLayoutId, callback) {
 		function(n, asyncCallback) {
 			var layoutName = layoutNameBase + ' ' + n;
 
-			actions.addLayout(groupId, layoutName, parentLayoutId, function(error, response) {
-				if (!error) {
-					bar.tick();
-					asyncCallback(null, response);
+			actions.addLayout(
+				groupId,
+				layoutName,
+				parentLayoutId,
+				function(error, response) {
+					if (!error) {
+						bar.tick();
+						asyncCallback(null, response);
+					}
 				}
-			});
+			);
 		},
 		function(error, results) {
 			if (!error) {

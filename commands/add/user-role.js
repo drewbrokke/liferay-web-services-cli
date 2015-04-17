@@ -20,19 +20,25 @@ function addUserRole(userInfo, roleInfo, callback) {
 	var getRoleAction = methodRouters.getRoleRouter(roleInfo);
 
 	function getUser(asyncCallback) {
-		actions[getUserAction](userInfo, function(error, response) {
-			if (!error) {
-				asyncCallback(null, JSON.parse(response));
+		actions[getUserAction](
+			userInfo,
+			function(error, response) {
+				if (!error) {
+					asyncCallback(null, JSON.parse(response));
+				}
 			}
-		});
+		);
 	}
 
 	function getRole(asyncCallback) {
-		actions[getRoleAction](roleInfo, function(error, response) {
-			if (!error) {
-				asyncCallback(null, JSON.parse(response));
+		actions[getRoleAction](
+			roleInfo,
+			function(error, response) {
+				if (!error) {
+					asyncCallback(null, JSON.parse(response));
+				}
 			}
-		});
+		);
 	}
 
 	async.parallel(
@@ -45,11 +51,15 @@ function addUserRole(userInfo, roleInfo, callback) {
 
 				roleIds.push(role.roleId);
 
-				actions.addUserRole(user.userId, roleIds, function(error, response) {
-					if (!error) {
-						console.log('Assigned role %j to user %j', role.name, user.firstName + ' ' + user.lastName);
+				actions.addUserRole(
+					user.userId,
+					roleIds,
+					function(error, response) {
+						if (!error) {
+							console.log('Assigned role %j to user %j', role.name, user.firstName + ' ' + user.lastName);
+						}
 					}
-				});
+				);
 
 				if (callback) {
 					callback(null, results);

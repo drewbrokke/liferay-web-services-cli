@@ -16,11 +16,14 @@ function getUser(userInfo, callback) {
 			function(n, asyncCallback) {
 				var getUserAction = methodRouters.getUserRouter(userInfo[n]);
 
-				actions[getUserAction](userInfo[n], function(error, response) {
-					if (!error) {
-						asyncCallback(null, response);
+				actions[getUserAction](
+					userInfo[n],
+					function(error, response) {
+						if (!error) {
+							asyncCallback(null, response);
+						}
 					}
-				});
+				);
 			},
 			function(error, results) {
 				if (!error) {
@@ -40,21 +43,23 @@ function getUser(userInfo, callback) {
 	}
 	else {
 		// Get all users in the company
-		actions.getCompanyUsers(function(error, response) {
-			if (!error) {
-				var users = JSON.parse(response);
+		actions.getCompanyUsers(
+			function(error, response) {
+				if (!error) {
+					var users = JSON.parse(response);
 
-				console.log('');
-
-				_.forEach(users, function(user) {
-					console.log('Got User:');
-					user = _.pick(user, ['screenName', 'firstName', 'lastName', 'emailAddress', 'userId']);
-
-					utils.printJSON(user);
 					console.log('');
-				})
+
+					_.forEach(users, function(user) {
+						console.log('Got User:');
+						user = _.pick(user, ['screenName', 'firstName', 'lastName', 'emailAddress', 'userId']);
+
+						utils.printJSON(user);
+						console.log('');
+					})
+				}
 			}
-		});
+		);
 	}
 }
 

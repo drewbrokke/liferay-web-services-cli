@@ -17,11 +17,14 @@ function getRole(roleInfo, callback) {
 		function(n, asyncCallback) {
 			var getRoleAction = methodRouters.getRoleRouter(roleInfo[n]);
 
-			actions[getRoleAction](roleInfo[n], function(error, response) {
-				if (!error) {
-					asyncCallback(null, response);
+			actions[getRoleAction](
+				roleInfo[n],
+				function(error, response) {
+					if (!error) {
+						asyncCallback(null, response);
+					}
 				}
-			});
+			);
 		},
 		function(error, results) {
 			if (!error) {

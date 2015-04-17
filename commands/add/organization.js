@@ -17,12 +17,15 @@ function addOrganization(numberOfOrganizations, parentOrganizationId, callback) 
 		function(n, asyncCallback) {
 			var organizationName = utils.generateOrganizationName();
 
-			actions.addOrganization(organizationName, function(error, response) {
-				if (!error) {
-					bar.tick();
-					asyncCallback(null, response);
+			actions.addOrganization(
+				organizationName,
+				function(error, response) {
+					if (!error) {
+						bar.tick();
+						asyncCallback(null, response);
+					}
 				}
-			});
+			);
 		},
 		function(error, results) {
 			if (!error) {
