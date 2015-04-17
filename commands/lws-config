@@ -2,10 +2,12 @@
 
 var _ = require('lodash');
 var async = require('async');
-var config = require('../lib/config');
 var inquirer = require('inquirer');
 var program = require('commander');
+
 var utils = require('../lib/utils');
+
+var config = utils.getConfig();
 
 program.parse(process.argv);
 
