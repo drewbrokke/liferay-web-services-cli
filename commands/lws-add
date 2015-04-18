@@ -5,7 +5,8 @@ var async = require('async');
 var program = require('commander');
 
 var commands = {
-	addGroup: require('./add/user'),
+	addGroup: require('./add/group'),
+	addGroupUsers: require('./add/group-users'),
 	addLayout: require('./add/layout'),
 	addOrganization: require('./add/organization'),
 	addRole: require('./add/role'),
@@ -110,7 +111,44 @@ program
 		}
 
 		async.series(tasks, function() {
-			commands.addUserRole(userInfo, roleInfo);
+			commands.addGroupUsers(userInfo, roleInfo);
+		});
+	});
+
+program
+	.command('site-users [quantityOfUsers]')
+	.alias('su')
+	.description('Create a site populated with users.')
+	.action(function(number) {
+		number = !_.isNaN(Number(number)) ? Number(number) : 1;
+
+		var groupId;
+		var tasks = [];
+		var userIds = [];
+
+		function addGroup(asyncCallback) {
+			commands.addGroup(1, function(error, results) {
+				groupId = JSON.parse(results[0]).groupId;
+				asyncCallback();
+			});
+		}
+
+		tasks.push(addGroup);
+
+		function addUser(asyncCallback) {
+			commands.addUser(number, function(error, results) {
+				_.forEach(results, function(user) {
+					userIds.push(JSON.parse(user).userId);
+				});
+
+				asyncCallback();
+			});
+		}
+
+		tasks.push(addUser);
+
+		async.series(tasks, function() {
+			commands.addGroupUsers(groupId, userIds);
 		});
 	});
 
