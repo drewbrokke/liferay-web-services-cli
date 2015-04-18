@@ -43,13 +43,15 @@ function addInstance() {
 	var defaultHost = 'localhost';
 	var defaultPort = '8080';
 	var defaultPortalVersion = 'master';
+	var defaultCompanyId = '20152';
 
-	configureInstance(defaultName, defaultUserName, defaultPassword, defaultHost, defaultPort, defaultPortalVersion);
+	configureInstance(defaultName, defaultUserName, defaultPassword, defaultHost, defaultPort, defaultPortalVersion, defaultCompanyId);
 }
 
-function configureInstance(defaultName, defaultUserName, defaultPassword, defaultHost, defaultPort, defaultPortalVersion) {
+function configureInstance(defaultName, defaultUserName, defaultPassword, defaultHost, defaultPort, defaultPortalVersion, defaultCompanyId) {
 	var questions = [];
 
+	// User cannot change the name of the default configuration
 	if (defaultName != 'default') {
 		var configNameQuestion = {
 			name: 'instanceName',
@@ -66,31 +68,23 @@ function configureInstance(defaultName, defaultUserName, defaultPassword, defaul
 		default: defaultUserName
 	};
 
-	questions.push(userNameQuestion);
-
 	var passwordQuestion = {
 		name: 'password',
 		message: 'Password?',
 		default: defaultPassword
 	};
 
-	questions.push(passwordQuestion);
-
-	var domainQuestion = {
-		name: 'domain',
+	var hostQuestion = {
+		name: 'host',
 		message: 'Host?',
 		default: defaultHost
 	};
-
-	questions.push(domainQuestion);
 
 	var portQuestion = {
 		name: 'port',
 		message: 'Port?',
 		default: defaultPort
 	};
-
-	questions.push(portQuestion);
 
 	var portalVersionQuestion = {
 		type: 'list',
@@ -104,7 +98,18 @@ function configureInstance(defaultName, defaultUserName, defaultPassword, defaul
 		]
 	};
 
+	var companyIdQuestion = {
+		name: 'companyId',
+		message: 'Company ID?',
+		default: defaultCompanyId
+	};
+
+	questions.push(userNameQuestion);
+	questions.push(passwordQuestion);
+	questions.push(hostQuestion);
+	questions.push(portQuestion);
 	questions.push(portalVersionQuestion);
+	questions.push(companyIdQuestion);
 
 	inquirer.prompt(questions, function(answers) {
 		if (defaultName != 'default') {
@@ -113,7 +118,15 @@ function configureInstance(defaultName, defaultUserName, defaultPassword, defaul
 
 		var configName = answers.instanceName || defaultName;
 
-		config.setInstanceConfig(configName, answers.userName, answers.password, answers.domain, answers.port, answers.portalVersion);
+		config.setInstanceConfig(
+			configName,
+			answers.userName,
+			answers.password,
+			answers.host,
+			answers.port,
+			answers.portalVersion,
+			answers.companyId
+		);
 	});
 }
 
@@ -150,7 +163,7 @@ function editInstance() {
 	if (instanceName && !!instanceConfig) {
 		var instanceConfig = instanceConfig;
 
-		configureInstance(instanceName, instanceConfig.username, instanceConfig.password, instanceConfig.domain, instanceConfig.port, instanceConfig.portalVersion);
+		configureInstance(instanceName, instanceConfig.username, instanceConfig.password, instanceConfig.host, instanceConfig.port, instanceConfig.portalVersion, instanceConfig.companyId);
 	}
 	else {
 		var editInstanceQuestion = {
@@ -164,7 +177,7 @@ function editInstance() {
 			instanceName = answers.instanceName;
 			instanceConfig = config.getInstanceConfig(instanceName);
 
-			configureInstance(instanceName, instanceConfig.username, instanceConfig.password, instanceConfig.domain, instanceConfig.port, instanceConfig.portalVersion);
+			configureInstance(instanceName, instanceConfig.username, instanceConfig.password, instanceConfig.host, instanceConfig.port, instanceConfig.portalVersion, instanceConfig.companyId);
 		});
 	}
 }
