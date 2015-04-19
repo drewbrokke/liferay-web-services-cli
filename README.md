@@ -12,15 +12,14 @@ During development and debugging of the master branch, I got very tired of havin
 I mostly wanted to see if I could get that process down to a single command in the shell (success!). This is useful for me personally, but I would like to see broader and more useful functionality added.
 
 **Current functionality:**
-- Create users, roles, sites, site pages, and organizations
+- Create users, roles, user groups, sites, site pages, and organizations
 - Get a single user or all users' information
 - Get a single role's information
 - Quickly create a user and a role, then assign the role to the user
+- Quickly create a site populated with users
 
 **Todo list:**
 - Compatibility with 6.2.x and 6.1.x
-- Add site members
-- Add user groups
 - Add portlets to pages
 - Interactive mode to manually add a user with specific information rather than generated info
 - Interactively edit and update user and site info
