@@ -47,9 +47,9 @@ program
 	});
 
 program
-	.command('site [quantity]')
-	.alias('s')
-	.description('Adds one or more sites to the database.')
+	.command('group [quantity]')
+	.alias('g')
+	.description('Adds one or more groups (sites) to the database.')
 	.action(function(number) {
 		number = !_.isNaN(Number(number)) ? Number(number) : 1;
 
@@ -59,7 +59,7 @@ program
 program
 	.command('page [quantity]')
 	.alias('p')
-	.option('-g, --groupId <integer>', 'The groupId to add the pages to. Defaults to the ID of the guest site.', Number, 20181)
+	.option('-g, --groupId <integer>', 'The groupId to add the pages to. Defaults to the ID of the guest group (site).', Number, 20181)
 	.option('-p, --parentLayoutId <integer>', 'The parent page ID to add the pages to. Defaults to 0.', Number, 0)
 	.description('Adds one or more pages to the database.')
 	.action(function(number) {
@@ -127,9 +127,9 @@ program
 	});
 
 program
-	.command('site-users [quantityOfUsers]')
-	.alias('su')
-	.description('Create a site populated with users.')
+	.command('group-users [quantityOfUsers]')
+	.alias('gu')
+	.description('Create a group (site) populated with users.')
 	.action(function(number) {
 		number = !_.isNaN(Number(number)) ? Number(number) : 1;
 
