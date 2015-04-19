@@ -10,6 +10,7 @@ var commands = {
 	addLayout: require('./add/layout'),
 	addOrganization: require('./add/organization'),
 	addRole: require('./add/role'),
+	addUserGroup: require('./add/user-group'),
 	addUserRole: require('./add/user-role'),
 	addUser: require('./add/user')
 }
@@ -74,6 +75,16 @@ program
 	.action(function(number) {
 		number = !_.isNaN(Number(number)) ? Number(number) : 1;
 		commands.addOrganization(number, this.parentOrganizationId);
+	});
+
+program
+	.command('user-group [quantity]')
+	.alias('ug')
+	.description('Adds one or more user groups to the database.')
+	.action(function(number) {
+		number = !_.isNaN(Number(number)) ? Number(number) : 1;
+
+		commands.addUserGroup(number);
 	});
 
 program
