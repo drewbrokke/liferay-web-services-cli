@@ -50,11 +50,11 @@ program
 	});
 
 program
-	.command('page [quantity]')
-	.alias('p')
-	.option('-g, --groupId <integer>', 'The groupId to add the pages to. Defaults to the ID of the guest group (site).', Number, 20181)
-	.option('-p, --parentLayoutId <integer>', 'The parent page ID to add the pages to. Defaults to 0.', Number, 0)
-	.description('Adds one or more pages to the database.')
+	.command('layout [quantity]')
+	.alias('l')
+	.option('-g, --groupId <integer>', 'The groupId to add the layouts (pages) to. Defaults to the ID of the guest group (site).', Number, 20181)
+	.option('-p, --parentLayoutId <integer>', 'The parent layout (page) ID to add the layouts to. Defaults to 0.', Number, 0)
+	.description('Adds one or more layouts (pages) to the database.')
 	.action(function(number) {
 		number = !_.isNaN(Number(number)) ? Number(number) : 1;
 		commands.addLayout(number, this.groupId, this.parentLayoutId);
