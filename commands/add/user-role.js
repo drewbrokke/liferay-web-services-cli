@@ -46,7 +46,7 @@ function registerCommand(program) {
 			}
 
 			async.series(tasks, function() {
-				addGroupUsers(userInfo, roleInfo);
+				addUserRole(userInfo, roleInfo);
 			});
 		});
 
