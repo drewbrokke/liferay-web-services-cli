@@ -4,16 +4,9 @@ var _ = require('lodash');
 var async = require('async');
 var program = require('commander');
 
-var commands = {
-	addGroup: require('./add/group'),
-	addGroupUsers: require('./add/group-users'),
-	addLayout: require('./add/layout'),
-	addOrganization: require('./add/organization'),
-	addRole: require('./add/role'),
-	addUserGroup: require('./add/user-group'),
-	addUserRole: require('./add/user-role'),
-	addUser: require('./add/user')
-}
+var utils = require('../lib/utils');
+
+var commands = utils.getCommands('add');
 
 program
 	.command('user [quantity]')

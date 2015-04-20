@@ -3,12 +3,16 @@
 var _ = require('lodash');
 var program = require('commander');
 
+var utils = require('../lib/utils');
+
+var commands = utils.getCommands('get');
+
 program
 	.command('user [userInfo...]')
 	.alias('u')
 	.description('Gets one or more users from the database. If no user info is provided, it will return all users.')
 	.action(function(userInfo) {
-		require('./get/user')(userInfo);
+		commands.getUser(userInfo);
 	});
 
 program
@@ -16,7 +20,7 @@ program
 	.alias('r')
 	.description('Gets one or more roles from the database. Role id or name is required.')
 	.action(function(roleInfo) {
-		require('./get/role')(roleInfo);
+		commands.getRole(roleInfo);
 	});
 
 program.parse(process.argv);
