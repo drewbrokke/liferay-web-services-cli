@@ -1,10 +1,25 @@
 #!/usr/bin/env node
 
+var _ = require('lodash');
 var async = require('async');
 
 var utils = require('../../lib/utils');
 
 var actions = utils.getActions();
+
+function registerCommand(program) {
+	program
+		.command('group [quantity]')
+		.alias('g')
+		.description('Adds one or more groups (sites) to the database.')
+		.action(function(number) {
+			number = !_.isNaN(Number(number)) ? Number(number) : 1;
+
+			addGroup(number);
+		});
+
+	return program;
+}
 
 function addGroup(numberOfGroups, callback) {
 	var bar = utils.getProgressBar(numberOfGroups);
@@ -48,4 +63,5 @@ function addGroup(numberOfGroups, callback) {
 	return groups;
 }
 
-module.exports = addGroup;
+module.exports.registerCommand = registerCommand;
+module.exports.command = addGroup;

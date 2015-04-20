@@ -1,10 +1,38 @@
 #!/usr/bin/env node
 
+var _ = require('lodash');
 var async = require('async');
 
 var utils = require('../../lib/utils');
 
 var actions = utils.getActions();
+
+function registerCommand(program) {
+	program
+		.command('role [quantity]')
+		.alias('r')
+		.description('Adds one or more roles to the database.')
+		.option('-t, --type <type>', 'Type of role to add. Accepts "site" or "organization". Defaults to "regular".')
+		.action(function(number) {
+			var type = this.type;
+
+			number = !_.isNaN(Number(number)) ? Number(number) : 1;
+
+			if (type === 'site') {
+				type = 2;
+			}
+			else if (type === 'organization' || type === 'org') {
+				type = 3;
+			}
+			else {
+				type = 1;
+			}
+
+			addRole(number, type);
+		});
+
+	return program;
+}
 
 function addRole(numberOfRoles, type, callback) {
 	var roles = [];
@@ -47,4 +75,5 @@ function addRole(numberOfRoles, type, callback) {
 	return roles;
 }
 
-module.exports = addRole;
+module.exports.registerCommand = registerCommand;
+module.exports.command = addRole;

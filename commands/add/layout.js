@@ -1,10 +1,26 @@
 #!/usr/bin/env node
 
+var _ = require('lodash');
 var async = require('async');
 
 var utils = require('../../lib/utils');
 
 var actions = utils.getActions();
+
+function registerCommand(program) {
+	program
+		.command('layout [quantity]')
+		.alias('l')
+		.option('-g, --groupId <integer>', 'The groupId to add the layouts (pages) to. Defaults to the ID of the guest group (site).', Number, 20181)
+		.option('-p, --parentLayoutId <integer>', 'The parent layout (page) ID to add the layouts to. Defaults to 0.', Number, 0)
+		.description('Adds one or more layouts (pages) to the database.')
+		.action(function(number) {
+			number = !_.isNaN(Number(number)) ? Number(number) : 1;
+			commands.addLayout(number, this.groupId, this.parentLayoutId);
+		});
+
+	return program;
+}
 
 function addLayout(numberOfLayouts, groupId, parentLayoutId, callback) {
 	var layouts = [];
@@ -52,4 +68,5 @@ function addLayout(numberOfLayouts, groupId, parentLayoutId, callback) {
 	return layouts;
 }
 
-module.exports = addLayout;
+module.exports.registerCommand = registerCommand;
+module.exports.command = addLayout;

@@ -1,10 +1,24 @@
 #!/usr/bin/env node
 
+var _ = require('lodash');
 var async = require('async');
 
 var utils = require('../../lib/utils');
 
 var actions = utils.getActions();
+
+function registerCommand(program) {
+	program
+		.command('user [quantity]')
+		.alias('u')
+		.description('Adds one or more users to the database.')
+		.action(function(number) {
+			number = !_.isNaN(Number(number)) ? Number(number) : 1;
+			addUser(number);
+		});
+
+	return program;
+}
 
 function addUser(numberOfUsers, callback) {
 	var users = [];
@@ -51,4 +65,5 @@ function addUser(numberOfUsers, callback) {
 	return users;
 }
 
-module.exports = addUser;
+module.exports.registerCommand = registerCommand;
+module.exports.command = addUser;
