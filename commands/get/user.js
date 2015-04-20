@@ -8,6 +8,19 @@ var utils = require('../../lib/utils');
 var actions = utils.getActions();
 var methodRouters = utils.getMethodRouters();
 
+
+function registerCommand(program) {
+	program
+		.command('user [userInfo...]')
+		.alias('u')
+		.description('Gets one or more users from the database. If no user info is provided, it will return all users.')
+		.action(function(userInfo) {
+			getUser(userInfo);
+		});
+
+	return program;
+}
+
 function getUser(userInfo, callback) {
 	if (userInfo.length) {
 		// Get Users from provided info
@@ -63,4 +76,5 @@ function getUser(userInfo, callback) {
 	}
 }
 
-module.exports = getUser;
+module.exports.registerCommand = registerCommand;
+module.exports.command = getUser;

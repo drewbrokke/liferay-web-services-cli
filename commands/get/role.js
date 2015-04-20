@@ -7,6 +7,18 @@ var utils = require('../../lib/utils');
 var actions = utils.getActions();
 var methodRouters = utils.getMethodRouters();
 
+function registerCommand(program) {
+	program
+		.command('role <roleInfo...>')
+		.alias('r')
+		.description('Gets one or more roles from the database. Role id or name is required.')
+		.action(function(roleInfo) {
+			getRole(roleInfo);
+		});
+
+	return program;
+}
+
 function getRole(roleInfo, callback) {
 	if (!roleInfo.length) {
 		console.error('Please provide role info.');
@@ -43,4 +55,5 @@ function getRole(roleInfo, callback) {
 	);
 }
 
-module.exports = getRole;
+module.exports.registerCommand = registerCommand;
+module.exports.command = getRole;
