@@ -42,7 +42,7 @@ function registerCommand(program) {
 			tasks.push(addUser);
 
 			async.series(tasks, function() {
-				commands.addGroupUsers(groupId, userIds);
+				addGroupUsers(groupId, userIds);
 			});
 		});
 

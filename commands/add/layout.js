@@ -16,7 +16,7 @@ function registerCommand(program) {
 		.description('Adds one or more layouts (pages) to the database.')
 		.action(function(number) {
 			number = !_.isNaN(Number(number)) ? Number(number) : 1;
-			commands.addLayout(number, this.groupId, this.parentLayoutId);
+			addLayout(number, this.groupId, this.parentLayoutId);
 		});
 
 	return program;
