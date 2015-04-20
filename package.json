@@ -10,7 +10,6 @@
   "license": "MIT",
   "dependencies": {
     "async": "^0.9.0",
-    "chance": "^0.7.3",
     "commander": "^2.7.1",
     "faker": "^2.1.2",
     "fs-extra": "^0.18.0",
