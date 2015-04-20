@@ -4,6 +4,7 @@ var program = require('commander');
 
 var utils = require('../lib/utils');
 
+// Registers all commands in the 'add' directory with Commander
 program = utils.registerCommands(program, 'add');
 
 program.parse(process.argv);
