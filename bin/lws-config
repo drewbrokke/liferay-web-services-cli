@@ -27,13 +27,7 @@ var whichActionQuestion = {
 	type: 'list',
 	name: 'action',
 	message: 'What would you like to do?',
-	choices: [
-		actions.addInstanceAnswer,
-		actions.editInstanceAnswer,
-		actions.deleteInstanceAnswer,
-		actions.listInstancesAnswer,
-		actions.useInstanceAnswer
-	]
+	choices: _.values(actions)
 };
 
 function addInstance() {

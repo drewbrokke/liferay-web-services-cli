@@ -2,7 +2,7 @@
   "name": "liferay-web-services-cli",
   "version": "0.2.4",
   "description": "A command-line interface for Liferay's JSON Web Services",
-  "main": "commands/lws",
+  "main": "bin/lws",
   "scripts": {
     "test": "test"
   },
@@ -35,6 +35,6 @@
   "homepage": "https://github.com/drewbrokke/liferay-web-services-cli",
   "preferGlobal": true,
   "bin": {
-    "lws": "commands/lws"
+    "lws": "bin/lws"
   }
 }
