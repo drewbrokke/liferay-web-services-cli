@@ -5,10 +5,6 @@ var path = require('path');
 var program = require('commander');
 var userhome = require('userhome');
 
-if (!fs.existsSync(userhome('.lws.json'))) {
-	require('../lib/config').init();
-}
-
 program
 	.version(require('../package.json').version)
 	.command('add', 'Add an object to the database.')
