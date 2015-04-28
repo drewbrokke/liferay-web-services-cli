@@ -3,7 +3,7 @@ A command-line interface for [Liferay's JSON Web Services](https://www.liferay.c
 
 It is currently *master only*.
 
-## What it is (and isn't)
+## What it is
 During development and debugging of the master branch, I got very tired of having to repeatedly:
 - Create a user
 - Create a role
@@ -63,13 +63,9 @@ lws get user                            (returns the information for all users)
 
 # Adds a new role
 lws add role
-lws add r           ('role' is aliased to 'r')
-lws add role site   (adds a site role)
-lws add r 3         (Adds 3 regular roles)
-
-# Gets an existing role
-lws get role 12345      (roleId)
-lws get role roleName
+lws add r               ('role' is aliased to 'r')
+lws add role -t site    (adds a site role)
+lws add r 3             (Adds 3 regular roles)
 
 # Creates a new user, a new role, and assigns the role to the user
 lws add user-role 
@@ -78,10 +74,20 @@ lws add ur          ('user-role' is aliased to 'ur')
 # Assigns a specific role to a specific user
 lws aur -u 12345 -r 54321
 
+# Groups (sites)
+lws add group           (aliased to 'g')
+
+# Creates a site and populates it with users
+lws add group-user      (aliased to 'gu')
+
 # And more - 
-lws add site            (aliased to 's')
-lws add page            (aliased to 'p') 
+lws add layout          (aliased to 'l') 
 lws add organization    (aliased to 'o')
+lws add user-group      (aliased to 'ug')
+
+# Gets an existing role
+lws get role 12345      (roleId)
+lws get role roleName
 
 # Configure for use with additional instances of portal:
 lws config
@@ -97,7 +103,10 @@ lws add -h
 lws add page -h
 ```
 
-
+## Changes
+**0.2.5**
+- Speed improvements - multiple items are added much faster now.
+- Internal strucure changes to make the methods more flexible
 
 
 
