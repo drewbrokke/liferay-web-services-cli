@@ -104,6 +104,9 @@ lws add page -h
 ```
 
 ## Changes
+**2.5.1**
+- Reduce parallel reqest limit.  In some cases it might have caused indexing errors to send too many requests at once.
+
 **0.2.5**
 - Speed improvements - multiple items are added much faster now.
 - Internal strucure changes to make the methods more flexible
