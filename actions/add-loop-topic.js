@@ -1,4 +1,4 @@
-var Action = require('../actionClassConnect');
+var Action = require('../actionClassLoop');
 
 module.exports = function(payload, callback) {
 	var name = payload.name.replace(/\s/g, '');
@@ -7,7 +7,7 @@ module.exports = function(payload, callback) {
 
 	var url = 'p_p_lifecycle=1&name=' + name + '&description=' + description;
 
-	var action = new Action('/connect/topics/add?', url);
+	var action = new Action('/loop/topics/add?', url);
 
 	action.doAction(callback);
 };

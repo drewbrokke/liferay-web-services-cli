@@ -2,7 +2,7 @@ var request = require('request');
 var utils = require('./lib/utils');
 
 function Action(actionPath, url) {
-	this.actionPath = 'http://test@liferay.com:test@localhost:8080/web/guest/connect/-' + actionPath + url;
+	this.actionPath = 'http://test@liferay.com:test@localhost:8080/web/guest/loop/-' + actionPath + url;
 }
 
 Action.prototype.doAction = function(callback) {

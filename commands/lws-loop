@@ -23,7 +23,7 @@ var addDivision = function(type, amount) {
 				division.name = utils.generateLocation();
 			}
 
-			require('../actions/add-connect-division.js')(division, function(error, response) {
+			require('../actions/add-loop-division.js')(division, function(error, response) {
 				if (!error) {
 					bar.tick();
 					callback(null, response);
@@ -39,11 +39,11 @@ var addDivision = function(type, amount) {
 };
 
 program
-	.option('-u, --addUsers [number]', 'Add Connect Persons')
-	.option('-t, --addTopics [number]', 'Add Connect Topics')
-	.option('-o, --addOffice [number]', 'Add Connect Office')
-	.option('-T, --addTeam [number]', 'Add Connect Team')
-	.option('-d, --addDepartment [number]', 'Add Connect Department')
+	.option('-u, --addUsers [number]', 'Add Loop Persons')
+	.option('-t, --addTopics [number]', 'Add Loop Topics')
+	.option('-o, --addOffice [number]', 'Add Loop Office')
+	.option('-T, --addTeam [number]', 'Add Loop Team')
+	.option('-d, --addDepartment [number]', 'Add Loop Department')
 	.parse(process.argv);
 
 	if (program.addUsers) {
@@ -57,7 +57,7 @@ program
 			function(n, callback) {
 				var person = utils.generateUserInfo();
 
-				require('../actions/add-connect-user.js')(person, function(error, response) {
+				require('../actions/add-loop-user.js')(person, function(error, response) {
 					if (!error) {
 						bar.tick();
 						callback(null, response);
@@ -86,7 +86,7 @@ program
 					description: utils.generateDescription()
 				};
 
-				require('../actions/add-connect-topic.js')(topic, function(error, response) {
+				require('../actions/add-loop-topic.js')(topic, function(error, response) {
 					if (!error) {
 						bar.tick();
 						callback(null, response);
@@ -116,6 +116,6 @@ program
 		console.log('Must have properties set in portal-ext');
 		console.log('');
 		console.log('auto.login.hooks=com.liferay.portal.security.auth.BasicAuthHeaderAutoLogin');
-		console.log('auth.token.ignore.portlets=82,1_WAR_connectportlet');
+		console.log('auth.token.ignore.portlets=82,1_WAR_loopportlet');
 		console.log('');
 	}
