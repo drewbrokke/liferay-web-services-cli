@@ -5,8 +5,6 @@ var async = require('async');
 var inquirer = require('inquirer');
 var program = require('commander');
 
-var utils = require('../lib/utils');
-
 var configUtil = require('../lib/utils/configUtil');
 var outputUtil = require('../lib/utils/outputUtil');
 
