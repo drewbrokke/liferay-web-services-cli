@@ -7,7 +7,7 @@ var program = require('commander');
 
 var utils = require('../lib/utils');
 
-var config = utils.getConfig();
+var configUtil = require('../lib/utils/configUtil');
 
 program.parse(process.argv);
 
@@ -21,7 +21,7 @@ var actions = {
 
 var command = program.args[0];
 
-var instanceConfigList = config.getInstanceConfigList();
+var instanceConfigList = configUtil.getInstanceConfigList();
 
 var whichActionQuestion = {
 	type: 'list',
@@ -107,12 +107,12 @@ function configureInstance(defaultName, defaultUserName, defaultPassword, defaul
 
 	inquirer.prompt(questions, function(answers) {
 		if (defaultName != 'default') {
-			config.deleteInstanceConfig(defaultName);
+			configUtil.deleteInstanceConfig(defaultName);
 		}
 
 		var configName = answers.instanceName || defaultName;
 
-		config.setInstanceConfig(
+		configUtil.setInstanceConfig(
 			configName,
 			answers.userName,
 			answers.password,
@@ -126,10 +126,10 @@ function configureInstance(defaultName, defaultUserName, defaultPassword, defaul
 
 function deleteInstance(instanceName) {
 	instanceName = instanceName || program.args[1];
-	var instanceConfig = config.getInstanceConfig(instanceName);
+	var instanceConfig = configUtil.getInstanceConfig(instanceName);
 
 	if (instanceName && !!instanceConfig) {
-		config.deleteInstanceConfig(instanceName)
+		configUtil.deleteInstanceConfig(instanceName)
 	}
 	else {
 		var deleteInstanceQuestion = {
@@ -141,7 +141,7 @@ function deleteInstance(instanceName) {
 
 		inquirer.prompt([deleteInstanceQuestion], function(answers) {
 			if (answers.instanceName != 'default') {
-				config.deleteInstanceConfig(answers.instanceName)
+				configUtil.deleteInstanceConfig(answers.instanceName)
 			}
 			else {
 				console.log('You cannot delete the default instance configuration.');
@@ -152,7 +152,7 @@ function deleteInstance(instanceName) {
 
 function editInstance() {
 	var instanceName = program.args[1];
-	var instanceConfig = config.getInstanceConfig(instanceName);
+	var instanceConfig = configUtil.getInstanceConfig(instanceName);
 
 	if (instanceName && !!instanceConfig) {
 		var instanceConfig = instanceConfig;
@@ -169,7 +169,7 @@ function editInstance() {
 
 		inquirer.prompt([editInstanceQuestion], function(answers) {
 			instanceName = answers.instanceName;
-			instanceConfig = config.getInstanceConfig(instanceName);
+			instanceConfig = configUtil.getInstanceConfig(instanceName);
 
 			configureInstance(instanceName, instanceConfig.username, instanceConfig.password, instanceConfig.host, instanceConfig.port, instanceConfig.portalVersion, instanceConfig.companyId);
 		});
@@ -178,10 +178,10 @@ function editInstance() {
 
 function listInstances() {
 	console.log('');
-	_.forEach(config.getInstanceConfigs(), function(instance, instanceName) {
+	_.forEach(configUtil.getInstanceConfigs(), function(instance, instanceName) {
 		var appendix = ':';
 
-		if (instanceName === config.getCurrentInstanceName()) {
+		if (instanceName === configUtil.getCurrentInstanceName()) {
 			appendix = ' (ACTIVE):'
 		}
 
@@ -211,10 +211,10 @@ function routeAction(action) {
 
 function useInstance() {
 	var instanceName = program.args[1];
-	var instanceConfig = config.getInstanceConfig(instanceName);
+	var instanceConfig = configUtil.getInstanceConfig(instanceName);
 
 	if (instanceName && !!instanceConfig) {
-		config.setCurrentInstanceConfig(instanceName);
+		configUtil.setCurrentInstanceConfig(instanceName);
 	}
 	else {
 		var useInstanceQuestion = {
@@ -225,7 +225,7 @@ function useInstance() {
 		};
 
 		inquirer.prompt([useInstanceQuestion], function(answers) {
-			config.setCurrentInstanceConfig(answers.instanceName);
+			configUtil.setCurrentInstanceConfig(answers.instanceName);
 		});
 	}
 }
