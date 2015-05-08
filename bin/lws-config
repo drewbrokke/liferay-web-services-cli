@@ -42,67 +42,20 @@ function addInstance() {
 }
 
 function configureInstance(defaultName, defaultUserName, defaultPassword, defaultHost, defaultPort, defaultPortalVersion, defaultCompanyId) {
-	var questions = [];
+	var questions = [
+		{ name: 'instanceName', message: 'What would you like to name this instance configuration?', default: defaultName },
+		{ name: 'userName', message: 'Username or email address?', default: defaultUserName },
+		{ name: 'password', message: 'Password?', default: defaultPassword },
+		{ name: 'host', message: 'Host?', default: defaultHost },
+		{ name: 'port', message: 'Port?', default: defaultPort },
+		{ type: 'list', name: 'portalVersion', message: 'Portal Version?', default: defaultPortalVersion, choices: [ 'master', '6.2', '6.1' ] },
+		{ name: 'companyId', message: 'Company ID?', default: defaultCompanyId }
+	];
 
-	// User cannot change the name of the default configuration
-	if (defaultName != 'default') {
-		var configNameQuestion = {
-			name: 'instanceName',
-			message: 'What would you like to name this instance configuration?',
-			default: defaultName
-		};
-
-		questions.push(configNameQuestion);
+	// This removes the name question, making sure that 'default' is always named 'default'
+	if (defaultName === 'default') {
+		questions.shift();
 	}
-
-	var userNameQuestion = {
-		name: 'userName',
-		message: 'Username or email address?',
-		default: defaultUserName
-	};
-
-	var passwordQuestion = {
-		name: 'password',
-		message: 'Password?',
-		default: defaultPassword
-	};
-
-	var hostQuestion = {
-		name: 'host',
-		message: 'Host?',
-		default: defaultHost
-	};
-
-	var portQuestion = {
-		name: 'port',
-		message: 'Port?',
-		default: defaultPort
-	};
-
-	var portalVersionQuestion = {
-		type: 'list',
-		name: 'portalVersion',
-		message: 'Portal Version?',
-		default: defaultPortalVersion,
-		choices: [
-			'master',
-			'6.2',
-			'6.1'
-		]
-	};
-
-	var companyIdQuestion = {
-		name: 'companyId',
-		message: 'Company ID?',
-		default: defaultCompanyId
-	};
-
-	questions.push(userNameQuestion);
-	questions.push(passwordQuestion);
-	questions.push(hostQuestion);
-	questions.push(portQuestion);
-	questions.push(portalVersionQuestion);
-	questions.push(companyIdQuestion);
 
 	inquirer.prompt(questions, function(answers) {
 		if (defaultName != 'default') {
