@@ -3,7 +3,7 @@ A command-line interface for [Liferay's JSON Web Services](https://www.liferay.c
 
 It is currently *master only*.
 
-## What it is
+## What is it?
 During development and debugging of the master branch, I got very tired of having to repeatedly:
 - Create a user
 - Create a role
@@ -17,12 +17,12 @@ I mostly wanted to see if I could get that process down to a single command in t
 - Get a single role's information
 - Quickly create a user and a role, then assign the role to the user
 - Quickly create a site populated with users
+- Interactive adding of users, groups (sites), layouts (pages), site memberships, and more!
 
 **Todo list:**
 - Compatibility with 6.2.x and 6.1.x
 - Add portlets to pages
-- Interactive mode to manually add a user with specific information rather than generated info
-- Interactively edit and update user and site info
+- More interactive functionality
 - Compatibility with a plugin system - devs can add their own commands, actions and workflows.
 
 Please let me know of any actions or features you would find useful.  There's a lot of methods in the JSONWS api, so it may take a while to add all the possible use-cases.  Suggestions help me know where the interest is.  Also, feel free to fork the repo and contribute.
@@ -49,6 +49,8 @@ ERROR:  { [Error: getaddrinfo ENOTFOUND undefined]
 Simply delete `~/.lws.json` or edit it and change all the `domain` keys to `host` (e.g. `"domain": "localhost"` changes to `"host": "localhost"`).
 
 **Examples:**
+
+**Quickly adding sample info**
 ```
 # Adds a new user
 lws add user
@@ -95,6 +97,15 @@ lws config add ee-6.2.x
 lws config use ee-6.2.x
 ```
 
+**Many of the commands support the interactive flag (`-i` or `--interactive`):**
+```
+lws add user -i
+lws add role -i
+lws add group -i
+lws add group-users -i  (site membership)
+lws add layout -i       (you can add pages to particular sites/make them sub-pages)
+```
+
 **Help:**
 ```
 # Help can be accessed per command level
@@ -104,6 +115,10 @@ lws add page -h
 ```
 
 ## Changes
+**0.2.6**
+- Adds an interactive mode for many of the commands using the `-i` flag!
+- Lots of internal restructuring to prepare for plugins support
+
 **0.2.52**
 - Reduce parallel reqest limit.  In some cases it might have caused indexing errors to send too many requests at once.
 
