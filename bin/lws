@@ -7,18 +7,54 @@ var fs = require('fs');
 var path = require('path');
 var program = require('commander');
 
-program
-	.version(require('../package.json').version)
-	.command('add', 'Add an object to the database.')
-	.command('delete', 'Delete an object from the database.')
-	.command('get', 'Get an object from the database.')
-	.command('config', 'Configure LWS.');
+var configUtil = lws.utils.configUtil;
 
-// Some logic that searches global dirs and finds modules
-// Each calls 'program.command()'
+function runProgram() {
+	program
+		.version(require('../package.json').version)
+		.command('add', 'Add an object to the database.')
+		.command('delete', 'Delete an object from the database.')
+		.command('get', 'Get an object from the database.')
+		.command('config', 'Configure LWS.');
 
-program.parse(process.argv);
+	// Some logic that searches global dirs and finds modules
+	// Each calls 'program.command()'
 
-if (!process.argv.slice(2).length) {
-	program.outputHelp();
+	program.parse(process.argv);
+
+	if (!process.argv.slice(2).length) {
+		program.outputHelp();
+	}
 }
+
+// Check to see if the company ID is valid
+lws.actions.getCompany(configUtil.getCurrentHost())
+	.then(function(company) {
+		var companyId = company.companyId;
+
+		if (configUtil.getCurrentCompanyId() === company.companyId) {
+			runProgram();
+		}
+		else {
+			console.log('Updating companyId...');
+
+			var config = configUtil.getCurrentInstanceConfig();
+
+			configUtil.setInstanceConfig(
+				configUtil.getCurrentInstanceName(),
+				config.username,
+				config.password,
+				config.host,
+				config.port,
+				config.portalVersion,
+				companyId
+			);
+
+			console.log('companyId updated to %j', companyId);
+
+			runProgram();
+		}
+	})
+	.catch(function(error) {
+		console.log('error: ', error);
+	});
