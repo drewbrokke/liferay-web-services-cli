@@ -40,17 +40,9 @@ lws.actions.getCompany(configUtil.getCurrentHost())
 
 			var config = configUtil.getCurrentInstanceConfig();
 
-			configUtil.setInstanceConfig(
-				configUtil.getCurrentInstanceName(),
-				config.username,
-				config.password,
-				config.host,
-				config.port,
-				config.portalVersion,
-				companyId
-			);
+			configUtil.setInstanceConfig(configUtil.getCurrentInstanceName(), config.username, config.password, config.host, config.port, config.portalVersion, companyId);
 
-			console.log('companyId updated to %j', companyId);
+			console.log('Current companyId updated to %j', companyId);
 
 			runProgram();
 		}
