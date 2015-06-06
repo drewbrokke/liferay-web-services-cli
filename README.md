@@ -116,6 +116,9 @@ lws add page -h
 
 ## Changes
 **0.2.6**
+- The companyId is now automatically detected and updated if differnt that the configuration.
+
+**0.2.6**
 - Adds an interactive mode for many of the commands using the `-i` flag!
 - Lots of internal restructuring to prepare for plugins support
 
