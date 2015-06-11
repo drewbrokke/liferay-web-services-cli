@@ -48,5 +48,5 @@ lws.actions.getCompany(configUtil.getCurrentHost())
 		}
 	})
 	.catch(function(error) {
-		console.log('error: ', error);
+		console.error(error.stack);
 	});
