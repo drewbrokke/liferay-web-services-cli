@@ -27,26 +27,32 @@ function runProgram() {
 	}
 }
 
-// Check to see if the company ID is valid
-lws.actions.getCompany(configUtil.getCurrentHost())
-	.then(function(company) {
-		var companyId = company.companyId;
 
-		if (configUtil.getCurrentCompanyId() === company.companyId) {
-			runProgram();
-		}
-		else {
-			console.log('Updating companyId...');
+if (process.argv[2] === 'config') {
+	runProgram();
+}
+else {
+	// Check to see if the company ID is valid
+	lws.actions.getCompany(configUtil.getCurrentHost())
+		.then(function(company) {
+			var companyId = company.companyId;
 
-			var config = configUtil.getCurrentInstanceConfig();
+			if (configUtil.getCurrentCompanyId() === company.companyId) {
+				runProgram();
+			}
+			else {
+				console.log('Updating companyId...');
 
-			configUtil.setInstanceConfig(configUtil.getCurrentInstanceName(), config.username, config.password, config.host, config.port, config.portalVersion, companyId);
+				var config = configUtil.getCurrentInstanceConfig();
 
-			console.log('Current companyId updated to %j', companyId);
+				configUtil.setInstanceConfig(configUtil.getCurrentInstanceName(), config.username, config.password, config.host, config.port, config.portalVersion, companyId);
 
-			runProgram();
-		}
-	})
-	.catch(function(error) {
-		console.error(error.stack);
-	});
+				console.log('Current companyId updated to %j', companyId);
+
+				runProgram();
+			}
+		})
+		.catch(function(error) {
+			console.error(error.stack);
+		});
+}
