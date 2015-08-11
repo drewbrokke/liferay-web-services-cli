@@ -1,134 +1,86 @@
-# Liferay Web Services CLI
+# Liferay Web Services CLI (LWS)
 A command-line interface for [Liferay's JSON Web Services](https://www.liferay.com/api/jsonws).
-
-It is currently *master only*.
-
-## What is it?
-During development and debugging of the master branch, I got very tired of having to repeatedly:
-- Create a user
-- Create a role
-- Assign the role to the user
-
-I mostly wanted to see if I could get that process down to a single command in the shell (success!). This is useful for me personally, but I would like to see broader and more useful functionality added.
-
-**Current functionality:**
-- Create users, roles, user groups, sites, site pages, and organizations
-- Get a single user or all users' information
-- Get a single role's information
-- Quickly create a user and a role, then assign the role to the user
-- Quickly create a site populated with users
-- Interactive adding of users, groups (sites), layouts (pages), site memberships, and more!
-
-**Todo list:**
-- Compatibility with 6.2.x and 6.1.x
-- Add portlets to pages
-- More interactive functionality
-- Compatibility with a plugin system - devs can add their own commands, actions and workflows.
-
-Please let me know of any actions or features you would find useful.  There's a lot of methods in the JSONWS api, so it may take a while to add all the possible use-cases.  Suggestions help me know where the interest is.  Also, feel free to fork the repo and contribute.
-
-## Installing
-```
-npm install -g liferay-web-services-cli
-```
 
 ## Usage
 ```
-lws <command> [options]
+lws --help
+lws <command> --help
+lws <command> <sub-command> --help
 ```
 
-**Note:**
-If after updating you are getting an error like this one:
+Example: Adding three users
 ```
-ERROR:  { [Error: getaddrinfo ENOTFOUND undefined]
-  code: 'ENOTFOUND',
-  errno: 'ENOTFOUND',
-  syscall: 'getaddrinfo',
-  hostname: 'undefined' }
-```
-Simply delete `~/.lws.json` or edit it and change all the `domain` keys to `host` (e.g. `"domain": "localhost"` changes to `"host": "localhost"`).
-
-**Examples:**
-
-**Quickly adding sample info**
-```
-# Adds a new user
-lws add user
-lws add u               ('user' is aliased to 'u')
-lws add user 20         (adds 20 users.  You can add as many as you want)
-
-# Gets an existing user
-lws get user 12345                      (get a user by user id)
-lws get u userScreenName                (get a user by screen name)
-lws get user useremail@usermail.com     (get a user by email address)
-lws get user                            (returns the information for all users)
-
-# Adds a new role
-lws add role
-lws add r               ('role' is aliased to 'r')
-lws add role -t site    (adds a site role)
-lws add r 3             (Adds 3 regular roles)
-
-# Creates a new user, a new role, and assigns the role to the user
-lws add user-role 
-lws add ur          ('user-role' is aliased to 'ur')
-
-# Assigns a specific role to a specific user
-lws aur -u 12345 -r 54321
-
-# Groups (sites)
-lws add group           (aliased to 'g')
-
-# Creates a site and populates it with users
-lws add group-user      (aliased to 'gu')
-
-# And more - 
-lws add layout          (aliased to 'l') 
-lws add organization    (aliased to 'o')
-lws add user-group      (aliased to 'ug')
-
-# Gets an existing role
-lws get role 12345      (roleId)
-lws get role roleName
-
-# Configure for use with additional instances of portal:
-lws config
-lws config add ee-6.2.x
-lws config use ee-6.2.x
+lws add user 3
 ```
 
-**Many of the commands support the interactive flag (`-i` or `--interactive`):**
+## Description
+Liferay Web Services CLI (LWS) is a command-line tool for developers to **quickly add sample data to a Liferay instance**. It will generate dummy data (users, organizations, user-groups, roles, sites, pages) with commands like `lws add user` or `lws add role`.
+
+There are also combo commands like `lws add user-role` which will create a user, create a role, then assign that role to a user.
+
+All commands are aliased, For example, you can type `lws add o` to add a user instead of `lws add organization`. The aliases can be found in the help output.
+
+
+## Passing options to commands
+
+LWS makes it very easy to add lots of sample data quickly.  Many of the `add` commands can be given a quantity to add multiples of an item.  For example, `lws add user 50` will add 50 users to the database very quickly!
+
+Other commands take arguments to specify details about the objects being added.  `lws add r -t site` will add a site role (whereas the default is a regular role).
+
+You can also combine the two.  `lws add r -t site 5` will add 5 different site roles.
+
+## Interactive mode
+Some commands support the `-i` flag, which allows you to create or adjust data interactively. For example, you can add users to a site (group) using `lws add group-users -i`.  You will be prompted to first select the site, then choose available users to add to the site.
+
+Another example would be adding a user with `lws add u -i`.  You will then be prompted for a name and other details, rather than using generated user data (though you can only create one at a time this way).
+
+
+## Multiple Liferay instances
+LWS supports switching between different Liferay instances.  You can set up LWS for use with a different instance using the `lws config` command.  This will allow you to configure the username, password, hostname, and port you use for each instance.
+
+`lws config use` will switch which instance LWS interacts with.
+
+``
+## More Examples
+**Add 5 groups:**
 ```
-lws add user -i
-lws add role -i
-lws add group -i
-lws add group-users -i  (site membership)
-lws add layout -i       (you can add pages to particular sites/make them sub-pages)
+lws add group 5
+lws add g 5
 ```
 
-**Help:**
+**Add 20 users:**
 ```
-# Help can be accessed per command level
-lws -h
-lws add -h
-lws add page -h
+lws add u 20
 ```
+
+**Add a group, then a user, then assign the user to the group:**
+```
+lws add gu
+```
+
+**Add users to a site (group) interactively**
+```
+lws add gu -i
+```
+
+**Get all users:**
+```
+lws get u
+```
+
 
 ## Changes
+
 **0.2.6**
-- The companyId is now automatically detected and updated if differnt that the configuration.
+- The companyId is now automatically detected and updated if different than the configuration.
 
 **0.2.6**
 - Adds an interactive mode for many of the commands using the `-i` flag!
 - Lots of internal restructuring to prepare for plugins support
 
 **0.2.52**
-- Reduce parallel reqest limit.  In some cases it might have caused indexing errors to send too many requests at once.
+- Reduce parallel request limit.  In some cases it might have caused indexing errors to send too many requests at once.
 
 **0.2.5**
 - Speed improvements - multiple items are added much faster now.
-- Internal strucure changes to make the methods more flexible
-
-
-
-
+- Internal structure changes to make the methods more flexible
