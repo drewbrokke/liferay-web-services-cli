@@ -72,6 +72,10 @@ function configureInstance(defaultName, defaultUserName, defaultPassword, defaul
 			answers.portalVersion,
 			answers.companyId
 		);
+
+		if (defaultName = configUtil.getCurrentInstanceName) {
+			configUtil.setCurrentInstanceConfig(configName);
+		}
 	});
 }
 
