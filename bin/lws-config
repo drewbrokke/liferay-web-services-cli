@@ -30,25 +30,23 @@ var whichActionQuestion = {
 
 function addInstance() {
 	var defaultName = 'Instance config ' + instanceConfigList.length;
-	var defaultUserName = 'test@liferay.com';
+	var defaultUserName = 'test';
 	var defaultPassword = 'test';
+	var defaultMailDomain = 'liferay.com';
 	var defaultHost = 'localhost';
 	var defaultPort = '8080';
-	var defaultPortalVersion = 'master';
-	var defaultCompanyId = '20152';
 
-	configureInstance(defaultName, defaultUserName, defaultPassword, defaultHost, defaultPort, defaultPortalVersion, defaultCompanyId);
+	configureInstance(defaultName, defaultUserName, defaultPassword, defaultMailDomain, defaultHost, defaultPort);
 }
 
-function configureInstance(defaultName, defaultUserName, defaultPassword, defaultHost, defaultPort, defaultPortalVersion, defaultCompanyId) {
+function configureInstance(defaultName, defaultUserName, defaultPassword, defaultMailDomain, defaultHost, defaultPort) {
 	var questions = [
 		{ name: 'instanceName', message: 'What would you like to name this instance configuration?', default: defaultName },
 		{ name: 'userName', message: 'Username or email address?', default: defaultUserName },
 		{ name: 'password', message: 'Password?', default: defaultPassword },
+		{ name: 'mailDomain', message: 'Mail domain?', default: defaultMailDomain },
 		{ name: 'host', message: 'Host?', default: defaultHost },
 		{ name: 'port', message: 'Port?', default: defaultPort },
-		{ type: 'list', name: 'portalVersion', message: 'Portal Version?', default: defaultPortalVersion, choices: [ 'master', '6.2', '6.1' ] },
-		{ name: 'companyId', message: 'Company ID?', default: defaultCompanyId }
 	];
 
 	// This removes the name question, making sure that 'default' is always named 'default'
@@ -67,12 +65,13 @@ function configureInstance(defaultName, defaultUserName, defaultPassword, defaul
 			configName,
 			answers.userName,
 			answers.password,
+			answers.mailDomain,
 			answers.host,
-			answers.port,
-			answers.portalVersion,
-			answers.companyId
+			answers.port
 		);
 
+		// Updates the currentInstanceConfig parmeter
+		// Makes sure that editing the currently used config does not make it unusable
 		if (defaultName = configUtil.getCurrentInstanceName) {
 			configUtil.setCurrentInstanceConfig(configName);
 		}
@@ -112,7 +111,7 @@ function editInstance() {
 	if (instanceName && !!instanceConfig) {
 		var instanceConfig = instanceConfig;
 
-		configureInstance(instanceName, instanceConfig.username, instanceConfig.password, instanceConfig.host, instanceConfig.port, instanceConfig.portalVersion, instanceConfig.companyId);
+		configureInstance(instanceName, instanceConfig.username, instanceConfig.password, instanceConfig.mailDomain, instanceConfig.host, instanceConfig.port);
 	}
 	else {
 		var editInstanceQuestion = {
@@ -126,7 +125,7 @@ function editInstance() {
 			instanceName = answers.instanceName;
 			instanceConfig = configUtil.getInstanceConfig(instanceName);
 
-			configureInstance(instanceName, instanceConfig.username, instanceConfig.password, instanceConfig.host, instanceConfig.port, instanceConfig.portalVersion, instanceConfig.companyId);
+			configureInstance(instanceName, instanceConfig.username, instanceConfig.password, instanceConfig.mailDomain, instanceConfig.host, instanceConfig.port);
 		});
 	}
 }
@@ -147,20 +146,31 @@ function listInstances() {
 }
 
 function routeAction(action) {
-	if (action === 'add' || action === actions.addInstanceAnswer) {
-		addInstance();
-	}
-	else if (action === 'edit' || action === actions.editInstanceAnswer) {
-		editInstance();
-	}
-	else if (action === 'delete' || action === actions.deleteInstanceAnswer) {
-		deleteInstance();
-	}
-	else if (action === 'list' || action === actions.listInstancesAnswer) {
-		listInstances();
-	}
-	else if (action === 'use' || action === actions.useInstanceAnswer) {
-		useInstance();
+	switch (action) {
+		case 'add':
+		case actions.addInstanceAnswer:
+			addInstance();
+			break;
+
+		case 'edit':
+		case actions.editInstanceAnswer:
+			editInstance();
+			break;
+
+		case 'delete':
+		case actions.deleteInstanceAnswer:
+			deleteInstance();
+			break;
+
+		case 'list':
+		case actions.listInstancesAnswer:
+			listInstances();
+			break;
+
+		case 'use':
+		case actions.useInstanceAnswer:
+			useInstance();
+			break;
 	}
 }
 

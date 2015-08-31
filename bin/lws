@@ -43,9 +43,7 @@ else {
 			else {
 				console.log('Updating companyId...');
 
-				var config = configUtil.getCurrentInstanceConfig();
-
-				configUtil.setInstanceConfig(configUtil.getCurrentInstanceName(), config.username, config.password, config.host, config.port, config.portalVersion, companyId);
+				configUtil.setCurrentCompanyId(companyId);
 
 				console.log('Current companyId updated to %j', companyId);
 
