@@ -9,6 +9,10 @@ var program = require('commander');
 
 var configUtil = lws.utils.configUtil;
 
+if (!configUtil.isUpgraded()) {
+	configUtil.upgrade();
+}
+
 function runProgram() {
 	program
 		.version(require('../package.json').version)
