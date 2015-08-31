@@ -14,7 +14,7 @@ lws add user 3
 ```
 
 ## Description
-Liferay Web Services CLI (LWS) is a command-line tool for developers to **quickly add sample data to a Liferay instance**. It will generate dummy data (users, organizations, user-groups, roles, sites, pages) with commands like `lws add user` or `lws add role`.
+Liferay Web Services CLI (LWS) is a command-line tool for developers to **quickly add sample data to a Liferay instance**. It will generate dummy data (users, organizations, user-groups, roles, sites, pages) with commands like ` lws add user ` or `lws add role`.
 
 There are also combo commands like `lws add user-role` which will create a user, create a role, then assign that role to a user.
 
@@ -40,7 +40,7 @@ LWS supports switching between different Liferay instances.  You can set up LWS 
 
 `lws config use` will switch which instance LWS interacts with.
 
-``
+
 ## More Examples
 **Add 5 groups:**
 ```
