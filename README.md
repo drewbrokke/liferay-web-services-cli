@@ -71,7 +71,12 @@ lws get u
 
 ## Changes
 
-**0.2.6**
+**0.3.0**
+- Returned data is now displayed in a table.  It's much easier to read than before.
+- Fixed several bugs having to do with changing configurations.
+- Updated the configuration schema to now properly handle different portal instances with different mail domains.  Now when creating users, they will not all be `@liferay.com`, but will follow the instance's mail domain.
+
+**0.2.8**
 - The companyId is now automatically detected and updated if different than the configuration.
 
 **0.2.6**
