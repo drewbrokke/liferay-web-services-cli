@@ -33,7 +33,7 @@ if (process.argv[2] === 'config') {
 }
 else {
 	// Check to see if the company ID is valid
-	lws.actions.getCompany(configUtil.getCurrentHost())
+	lws.actions.getCompany(configUtil.getCurrentMailDomain())
 		.then(function(company) {
 			var companyId = company.companyId;
 
