@@ -41,7 +41,10 @@ else {
 		.then(function(company) {
 			var companyId = company.companyId;
 
-			if (configUtil.getCurrentCompanyId() === company.companyId) {
+			// Double equals used because they will not be the same type
+			// configUtil will return a Number,
+			// The API call will return a String
+			if (configUtil.getCurrentCompanyId() == companyId) {
 				runProgram();
 			}
 			else {
