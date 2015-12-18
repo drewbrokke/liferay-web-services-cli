@@ -72,7 +72,7 @@ function configureInstance(defaultName, defaultUserName, defaultPassword, defaul
 
 		// Updates the currentInstanceConfig parmeter
 		// Makes sure that editing the currently used config does not make it unusable
-		if (defaultName = configUtil.getCurrentInstanceName) {
+		if (defaultName === configUtil.getCurrentInstanceName) {
 			configUtil.setCurrentInstanceConfig(configName);
 		}
 	});
@@ -83,7 +83,7 @@ function deleteInstance(instanceName) {
 	var instanceConfig = configUtil.getInstanceConfig(instanceName);
 
 	if (instanceName && !!instanceConfig) {
-		configUtil.deleteInstanceConfig(instanceName)
+		configUtil.deleteInstanceConfig(instanceName);
 	}
 	else {
 		var deleteInstanceQuestion = {
@@ -95,7 +95,7 @@ function deleteInstance(instanceName) {
 
 		inquirer.prompt([deleteInstanceQuestion], function(answers) {
 			if (answers.instanceName != 'default') {
-				configUtil.deleteInstanceConfig(answers.instanceName)
+				configUtil.deleteInstanceConfig(answers.instanceName);
 			}
 			else {
 				console.log('You cannot delete the default instance configuration.');
@@ -109,8 +109,6 @@ function editInstance() {
 	var instanceConfig = configUtil.getInstanceConfig(instanceName);
 
 	if (instanceName && !!instanceConfig) {
-		var instanceConfig = instanceConfig;
-
 		configureInstance(instanceName, instanceConfig.username, instanceConfig.password, instanceConfig.mailDomain, instanceConfig.host, instanceConfig.port);
 	}
 	else {
@@ -136,7 +134,7 @@ function listInstances() {
 		var appendix = ':';
 
 		if (instanceName === configUtil.getCurrentInstanceName()) {
-			appendix = ' (ACTIVE):'
+			appendix = ' (ACTIVE):';
 		}
 
 		console.log(instanceName + appendix);
@@ -196,7 +194,7 @@ function useInstance() {
 }
 
 if (command) {
-	routeAction(command.toLowerCase())
+	routeAction(command.toLowerCase());
 }
 else {
 	console.log('');
@@ -204,4 +202,3 @@ else {
 		routeAction(answers.action);
 	});
 }
-
