@@ -1,63 +1,491 @@
 #!/usr/bin/env node
 
-var lws = module.exports = require('../lib/resources');
-
+var args = require('minimist')(process.argv.slice(2));
+var capitalize = require('capitalize');
+var chalk = require('chalk');
+var cheerio = require('cheerio');
+var Promise = require('bluebird');
+var request = require('request');
 var _ = require('lodash');
-var fs = require('fs');
-var path = require('path');
-var program = require('commander');
 
-var configUtil = lws.utils.configUtil;
+var Method = require('../lib/Method');
 
-if (!configUtil.isUpgraded()) {
-	configUtil.upgrade();
+var outputUtil = require('../lib/utils/outputUtil');
+
+// Constants
+var URL_BASE = 'http://localhost:8080';
+
+var URL = URL_BASE + '/api/jsonws';
+
+var AUTH = {
+	username: 'test',
+	password: 'test'
+};
+
+var COMPANY_ID = require('../lib/utils/configUtil').getCurrentCompanyId();
+var REQUEST_LIMIT = 15;
+
+// Variables
+
+// The calls variable is used to queue up multiple method calls for chaining
+var CALLS = [];
+
+if (args._.indexOf('$') !== -1) {
+	CALLS = args._.join(' ').split(' $ ');
+
+	CALLS = _.map(CALLS, function(call) {
+		return call.split(' ');
+	});
+}
+else if (args._.length) {
+	CALLS.push(args._);
 }
 
-function runProgram() {
-	program
-		.version(require('../package.json').version)
-		.command('add', 'Add an object to the database.')
-		.command('delete', 'Delete an object from the database.')
-		.command('get', 'Get an object from the database.')
-		.command('config', 'Configure LWS.');
+var CALL_COUNT = 0;
 
-	// Some logic that searches global dirs and finds modules
-	// Each calls 'program.command()'
+var SERVICE = null;
+var SERVICE_IMPL = null;
+var SERVICE_ID = null;
+var METHOD = null;
 
-	program.parse(process.argv);
+function setServiceAndMethodValues() {
+	var currentCall = CALLS[CALL_COUNT];
 
-	if (!process.argv.slice(2).length) {
-		program.outputHelp();
+	if (!!currentCall) {
+		SERVICE = capitalize.words(currentCall[0]);
+		SERVICE_IMPL = SERVICE + 'ServiceImpl';
+		SERVICE_ID = 'apiService' + SERVICE_IMPL + 'Panel';
+
+		if (currentCall.length > 1) {
+			METHOD = currentCall[1];
+
+			if (METHOD.indexOf('-') === -1) {
+				METHOD = _.kebabCase(METHOD);
+			}
+		}
 	}
 }
 
+setServiceAndMethodValues();
 
-if (process.argv[2] === 'config') {
-	runProgram();
+var CACHE = {};
+
+var getDefaultValues = require('../lib/defaultValues');
+
+// Util Methods
+
+function contains(s, p) {
+	return s.indexOf(p) !== -1;
 }
-else {
-	// Check to see if the company ID is valid
-	lws.actions.getCompany(configUtil.getCurrentMailDomain())
-		.then(function(company) {
-			var companyId = company.companyId;
 
-			// Double equals used because they will not be the same type
-			// configUtil will return a Number,
-			// The API call will return a String
-			if (configUtil.getCurrentCompanyId() == companyId) {
-				runProgram();
+function get(URL, AUTH) {
+	return new Promise(function(resolve, reject) {
+		function getCallback(err, response, body) {
+			if (!err) {
+				resolve(body);
 			}
 			else {
-				console.log('Updating companyId...');
-
-				configUtil.setCurrentCompanyId(companyId);
-
-				console.log('Current companyId updated to %j', companyId);
-
-				runProgram();
+				reject(err);
 			}
-		})
-		.catch(function(error) {
-			console.error(error.stack);
+		}
+
+		request(URL, getCallback).auth(AUTH.username, AUTH.password);
+	});
+}
+
+function lowerCaseFirstLetter(s) {
+	s = s.split('');
+
+	var first = s.shift().toLowerCase();
+
+	s.unshift(first);
+
+	return s.join('');
+}
+
+function makeBasicPayloadObjectFromParams(params) {
+	var payload = {};
+
+	_.forEach(params, function(param) {
+		var value = null;
+		var type = param.type;
+
+		function isNumberType(type) {
+			return (contains(type, 'long') ||
+					contains(type, 'int') ||
+					contains(type, 'short') ||
+					contains(type, 'double'));
+		}
+
+		if (contains(type, '[]') ||
+			contains(type, 'util.List')) {
+		}
+		else if (contains(type, 'Map')) {
+			value = JSON.stringify({});
+		}
+		else if (contains(type, 'long') ||
+			contains(type, 'int') ||
+			contains(type, 'short') ||
+			contains(type, 'double')) {
+			value = 0;
+		}
+		else if (contains(type, 'boolean')) {
+			value = false;
+		}
+
+		if (param.name === 'end') {
+			value = 1000;
+		}
+
+		payload[param.name] = value;
+	});
+
+	return payload;
+}
+
+function printParameters(methodObject) {
+	var DEFAULT_VALUES = getDefaultValues();
+	var serviceConfig = DEFAULT_VALUES[SERVICE];
+	var methodConfig = null;
+	var requiredParams = [];
+	var hasDefaultValueParams = [];
+
+	if (!!serviceConfig) {
+		methodConfig = serviceConfig[methodObject.name];
+	}
+
+	if (!!methodConfig) {
+		if (methodConfig.params) {
+			hasDefaultValueParams = _.keys(methodConfig.params);
+		}
+
+		if (methodConfig.requiredParams && methodConfig.requiredParams.length) {
+			requiredParams = methodConfig.requiredParams;
+		}
+	}
+
+	_.forEach(methodObject.parameters, function(parameter) {
+		var additionalMessage = '';
+
+		if (hasDefaultValueParams.indexOf(parameter.name) !== -1) {
+			additionalMessage = chalk.green(' (default value configured)');
+		}
+
+		if (requiredParams.indexOf(parameter.name) !== -1) {
+			additionalMessage = chalk.red(' (required)');
+		}
+
+		console.log(chalk.yellow(parameter.name), ': ', chalk.blue(parameter.type), additionalMessage);
+	});
+}
+
+// Begin Getting...
+
+function listServices() {
+	get(URL, AUTH)
+		.then(function(html) {
+			var $ = cheerio.load(html);
+
+			var headings = _.trim($('.panel-heading .title-text').text()).split('  ');
+
+			console.log('');
+			console.log('Available Services:');
+			_.forEach(headings, function(heading) {
+				console.log(heading);
+			});
+			console.log('');
 		});
+}
+
+function listServiceMethods() {
+	get(URL, AUTH)
+		.then(function(html) {
+			var $ = cheerio.load(html);
+
+			var serviceBlock = $('#' + SERVICE_ID);
+
+			if (serviceBlock.length) {
+				var methodLinks = _.trim($(serviceBlock).find('.lfr-api-signature .method-name').text()).split('  ');
+
+				console.log('');
+				console.log('Available Methods for ' + SERVICE + ': (Names in ' + chalk.green.bold('green') +' are ready to use)');
+
+				var DEFAULT_VALUES = getDefaultValues();
+
+				_.forEach(methodLinks, function(methodLink) {
+					if (!!DEFAULT_VALUES[SERVICE] && !!DEFAULT_VALUES[SERVICE][methodLink]) {
+						console.log(chalk.green.bold(methodLink));
+					}
+					else {
+						console.log(methodLink);
+					}
+				});
+				console.log('');
+			}
+		});
+}
+
+function getMethodPageHTML(html) {
+	// Get link to method page
+	var $ = cheerio.load(html);
+
+	var serviceBlock = $('#' + SERVICE_ID);
+
+	if (serviceBlock.length) {
+		var methodLinks = $(serviceBlock).find('.lfr-api-signature .method-name');
+
+		var methodAnchorTag = _.filter(methodLinks, function(link) {
+			return _.trim($(link).text()) === METHOD;
+		})[0];
+
+		if (!!methodAnchorTag) {
+			var methodURL = $(methodAnchorTag).attr('href');
+
+			// return the html of the method page
+			return get(URL_BASE + methodURL, AUTH);
+		}
+		else {
+			throw new Error('No method found...');
+		}
+
+	}
+	else {
+		throw new Error('No service found...');
+	}
+}
+
+function getMethodObjectFromMethodPageHTML(html) {
+	// Scrape method parameters from html
+	var $ = cheerio.load(html);
+
+	var paramsHTML = $('.lfr-api-parameters .lfr-api-param');
+
+	var params = _.map(paramsHTML, function(param) {
+		param = $(param);
+
+		var name = _.trim(param.find('.lfr-api-param-name').text());
+		var type = _.trim(param.find('.lfr-api-param-type').text());
+
+		return {
+			name: name,
+			type: type
+		};
+	});
+
+	params = _.reject(params, function(param) {
+		return (param.name === 'p_auth' ||
+				param.name === 'serviceContext');
+	});
+
+	var methodObject = {
+		name: METHOD,
+		parameters: params,
+		path: $('.lfr-api-method > h2').text(),
+		service: SERVICE
+	};
+
+	return methodObject;
+}
+
+function prepareJobs(methodObject) {
+	// Prepares payload object with minimal values
+	var payloadTemplate = makeBasicPayloadObjectFromParams(methodObject.parameters);
+
+	// Sets current companyId
+	if (payloadTemplate.hasOwnProperty('companyId')) {
+		payloadTemplate.companyId = COMPANY_ID;
+	}
+
+	// Using a jobs array and Promise.map is in preparation for
+	// calling a command multiple times (e.g. adding 20 users)
+	var jobs = [];
+	var numberOfIterations = (args.n && typeof args.n === 'number') ? args.n : 1;
+
+	while(numberOfIterations) {
+		// Adds default values from method configuration
+		var payload = _.extend({}, payloadTemplate);
+		var DEFAULT_VALUES = getDefaultValues();
+		var serviceConfig = DEFAULT_VALUES[methodObject.service];
+
+		if (!!serviceConfig) {
+			var methodConfig = serviceConfig[methodObject.name];
+
+			if (!!methodConfig) {
+				var methodDefaultValues = methodConfig.params;
+
+				// Adds default values from config file
+				if (!!methodDefaultValues) {
+					_.forEach(methodDefaultValues, function(value, key) {
+						if (payload.hasOwnProperty(key)) {
+							payload[key] = value;
+						}
+					});
+				}
+
+				var requiredParams = methodConfig.requiredParams;
+
+				if (!!requiredParams && requiredParams.length) {
+					var unfulfilled = _.difference(requiredParams, _.keys(args));
+					unfulfilled = _.difference(unfulfilled, _.keys(CACHE));
+
+					if (unfulfilled.length) {
+						console.log('Required parameters not provided: ');
+
+						_.forEach(unfulfilled, function(parameter) {
+							console.log('parameter: ', parameter);
+						});
+
+						throw new Error();
+					}
+
+					_.forEach(requiredParams, function(requiredParam) {
+						if (!!CACHE[requiredParam]) {
+							payload[requiredParam] = CACHE[requiredParam];
+						}
+					});
+				}
+			}
+		}
+
+		// Adds user's values from command-line arguments
+		_.forEach(args, function(value, key) {
+			if (payload.hasOwnProperty(key)) {
+				payload[key] = value;
+
+				// If the parameter type is an array, assemble an array
+				_.forEach(methodObject.parameters, function(parameter) {
+					if (parameter.name === key && contains(parameter.type, '[]')) {
+						var arr = [];
+
+						arr.push(value);
+
+						payload[key] = JSON.stringify(arr);
+					}
+				});
+			}
+		});
+
+		// Creates the Method object with the api path and prepared
+		// payload object
+
+		jobs.push(new Method(methodObject.path, payload));
+
+		numberOfIterations--;
+	}
+
+	args.n = 1;
+
+	return jobs;
+}
+
+function callAPI(jobs) {
+	return Promise.map(jobs, function(method) {
+		return method.invoke()
+			.then(function(result) {
+				if (result === undefined) {
+					console.log('');
+					console.log('Payload object sent to server:');
+					console.log(method.payload);
+				}
+				else {
+					return result;
+				}
+			});
+	}, { concurrency: REQUEST_LIMIT });
+}
+
+function displayAndCacheResults(results) {
+	// The results should be an array
+	if (_.isArray(results[0])) {
+		results = results[0];
+	}
+
+	var DEFAULT_VALUES = getDefaultValues();
+
+	var cacheIds = [];
+	var displayKeys = null;
+	var displayValues = [];
+
+	var methodOmitFromResultsDisplayKeys = [];
+
+	if (DEFAULT_VALUES[SERVICE] &&
+		DEFAULT_VALUES[SERVICE][METHOD] &&
+		DEFAULT_VALUES[SERVICE][METHOD].omitFromResultsDisplayKeys &&
+		DEFAULT_VALUES[SERVICE][METHOD].omitFromResultsDisplayKeys.length) {
+
+		methodOmitFromResultsDisplayKeys = DEFAULT_VALUES[SERVICE][METHOD].omitFromResultsDisplayKeys;
+	}
+
+	_.forEach(results, function(result) {
+		if (result !== undefined) {
+			console.log('');
+
+			if (!_.isEmpty(result)) {
+				result = _.omit(result, function(value, key) {
+					return !value ||
+						methodOmitFromResultsDisplayKeys.indexOf(key) !== -1;
+				});
+
+				if (!displayKeys) {
+					displayKeys = _.keys(result);
+				}
+
+				displayValues.push(_.values(result));
+
+				var resultEntityId = result[lowerCaseFirstLetter(SERVICE) + 'Id'];
+
+				// Set single id
+				CACHE[lowerCaseFirstLetter(SERVICE) + 'Id'] = resultEntityId;
+
+				// Push to ids array
+				cacheIds.push(resultEntityId);
+			}
+		}
+	});
+
+	outputUtil.printTable(displayKeys, displayValues);
+
+	if (!_.isEmpty(cacheIds)) {
+		CACHE[lowerCaseFirstLetter(SERVICE) + 'Ids'] = JSON.stringify(cacheIds);
+	}
+
+	CALL_COUNT++;
+
+	if (CALLS[CALL_COUNT] !== undefined) {
+		setServiceAndMethodValues();
+
+		callCurrentJob();
+	}
+}
+
+function callCurrentJob() {
+	return get(URL, AUTH)
+		.then(getMethodPageHTML)
+		.then(getMethodObjectFromMethodPageHTML)
+		.then(prepareJobs)
+		.then(callAPI)
+		.then(displayAndCacheResults)
+		.catch(function(e) {});
+}
+
+if (args.c) {
+	require('./config');
+}
+else if (METHOD !== null) {
+	if (args.p) {
+		get(URL, AUTH)
+			.then(getMethodPageHTML)
+			.then(getMethodObjectFromMethodPageHTML)
+			.then(printParameters);
+	}
+	else {
+		// This is the actual api call
+		callCurrentJob();
+	}
+}
+else if (SERVICE_ID !== null) {
+	listServiceMethods();
+}
+else {
+	listServices();
 }

@@ -1,0 +1,63 @@
+#!/usr/bin/env node
+
+var lws = module.exports = require('../lib/resources');
+
+var _ = require('lodash');
+var fs = require('fs');
+var path = require('path');
+var program = require('commander');
+
+var configUtil = lws.utils.configUtil;
+
+if (!configUtil.isUpgraded()) {
+	configUtil.upgrade();
+}
+
+function runProgram() {
+	program
+		.version(require('../package.json').version)
+		.command('add', 'Add an object to the database.')
+		.command('delete', 'Delete an object from the database.')
+		.command('get', 'Get an object from the database.')
+		.command('config', 'Configure LWS.');
+
+	// Some logic that searches global dirs and finds modules
+	// Each calls 'program.command()'
+
+	program.parse(process.argv);
+
+	if (!process.argv.slice(2).length) {
+		program.outputHelp();
+	}
+}
+
+
+if (process.argv[2] === 'config') {
+	runProgram();
+}
+else {
+	// Check to see if the company ID is valid
+	lws.actions.getCompany(configUtil.getCurrentMailDomain())
+		.then(function(company) {
+			var companyId = company.companyId;
+
+			// Double equals used because they will not be the same type
+			// configUtil will return a Number,
+			// The API call will return a String
+			if (configUtil.getCurrentCompanyId() == companyId) {
+				runProgram();
+			}
+			else {
+				console.log('Updating companyId...');
+
+				configUtil.setCurrentCompanyId(companyId);
+
+				console.log('Current companyId updated to %j', companyId);
+
+				runProgram();
+			}
+		})
+		.catch(function(error) {
+			console.error(error.stack);
+		});
+}
