@@ -421,16 +421,24 @@ function displayAndCacheResults(results) {
 			console.log('');
 
 			if (!_.isEmpty(result)) {
+				// Removes columns according to method config's omitted keys
+				// array.
 				result = _.omit(result, function(value, key) {
-					return !value ||
-						methodOmitFromResultsDisplayKeys.indexOf(key) !== -1;
+					return methodOmitFromResultsDisplayKeys.indexOf(key) !== -1;
 				});
 
 				if (!displayKeys) {
 					displayKeys = _.keys(result);
 				}
 
-				displayValues.push(_.values(result));
+				// Replaces any null values with an empty string
+				var values = _.values(result);
+
+				values = _.map(values, function(value) {
+					return !!value ? value : '';
+				});
+
+				displayValues.push(values);
 
 				var resultEntityId = result[lowerCaseFirstLetter(SERVICE) + 'Id'];
 
