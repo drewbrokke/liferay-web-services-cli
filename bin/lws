@@ -440,10 +440,12 @@ function displayAndCacheResults(results) {
 
 				displayValues.push(values);
 
-				var resultEntityId = result[lowerCaseFirstLetter(SERVICE) + 'Id'];
+				var cacheIdKey = lowerCaseFirstLetter(SERVICE) + 'Id';
+
+				var resultEntityId = result[cacheIdKey];
 
 				// Set single id
-				CACHE[lowerCaseFirstLetter(SERVICE) + 'Id'] = resultEntityId;
+				CACHE[cacheIdKey] = resultEntityId;
 
 				// Push to ids array
 				cacheIds.push(resultEntityId);
