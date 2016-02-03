@@ -329,6 +329,66 @@ function prepareJobs(methodObject) {
 	var jobs = [];
 	var numberOfIterations = (args.n && typeof args.n === 'number') ? args.n : 1;
 
+	function addDefaultValuesFromConfig(defaultValues, currentValues) {
+		if (!_.isEmpty(defaultValues)) {
+			_.forEach(defaultValues, function(value, key) {
+				if (currentValues.hasOwnProperty(key)) {
+					currentValues[key] = value;
+				}
+			});
+		}
+
+		return currentValues;
+	}
+
+	function testRequiredParams(requiredParams, userParams, cacheParams) {
+		var unfulfilled = _.difference(requiredParams, userParams);
+		unfulfilled = _.difference(unfulfilled, cacheParams);
+
+		if (unfulfilled.length) {
+			console.log('Required parameters not provided: ');
+
+			_.forEach(unfulfilled, function(parameter) {
+				console.log('parameter: ', parameter);
+			});
+
+			throw new Error();
+		}
+
+		return false;
+	}
+
+	function addValuesFromCache(cache, requiredParams, currentValues) {
+		_.forEach(requiredParams, function(requiredParam) {
+			if (!!cache[requiredParam]) {
+				currentValues[requiredParam] = cache[requiredParam];
+			}
+		});
+
+		return currentValues;
+	}
+
+	function addValuesFromUserArgs(userArgs, methodParameters, currentValues) {
+		_.forEach(userArgs, function(value, key) {
+			if (currentValues.hasOwnProperty(key)) {
+				currentValues[key] = value;
+
+				// If the parameter type is an array, assemble an array
+				_.forEach(methodParameters, function(parameter) {
+					if (parameter.name === key && contains(parameter.type, '[]')) {
+						var arr = [];
+
+						arr.push(value);
+
+						currentValues[key] = JSON.stringify(arr);
+					}
+				});
+			}
+		});
+
+		return currentValues;
+	}
+
 	while(numberOfIterations) {
 		// Adds default values from method configuration
 		var payload = _.extend({}, payloadTemplate);
@@ -336,58 +396,21 @@ function prepareJobs(methodObject) {
 		var methodConfig = getMethodConfig(methodObject.service, methodObject.name);
 
 		if (!!methodConfig) {
-			var methodDefaultValues = methodConfig.params;
-
 			// Adds default values from config file
-			if (!!methodDefaultValues) {
-				_.forEach(methodDefaultValues, function(value, key) {
-					if (payload.hasOwnProperty(key)) {
-						payload[key] = value;
-					}
-				});
-			}
+			payload = addDefaultValuesFromConfig(methodConfig.params, payload);
 
 			var requiredParams = methodConfig.requiredParams;
 
-			if (!!requiredParams && requiredParams.length) {
-				var unfulfilled = _.difference(requiredParams, _.keys(args));
-				unfulfilled = _.difference(unfulfilled, _.keys(CACHE));
+			if (requiredParams.length) {
+				testRequiredParams(requiredParams, _.keys(args), _.keys(CACHE));
 
-				if (unfulfilled.length) {
-					console.log('Required parameters not provided: ');
-
-					_.forEach(unfulfilled, function(parameter) {
-						console.log('parameter: ', parameter);
-					});
-
-					throw new Error();
-				}
-
-				_.forEach(requiredParams, function(requiredParam) {
-					if (!!CACHE[requiredParam]) {
-						payload[requiredParam] = CACHE[requiredParam];
-					}
-				});
+				// Adds values from previously chained calls
+				payload = addValuesFromCache(CACHE, requiredParams, payload);
 			}
 		}
 
 		// Adds user's values from command-line arguments
-		_.forEach(args, function(value, key) {
-			if (payload.hasOwnProperty(key)) {
-				payload[key] = value;
-
-				// If the parameter type is an array, assemble an array
-				_.forEach(methodObject.parameters, function(parameter) {
-					if (parameter.name === key && contains(parameter.type, '[]')) {
-						var arr = [];
-
-						arr.push(value);
-
-						payload[key] = JSON.stringify(arr);
-					}
-				});
-			}
-		});
+		payload = addValuesFromUserArgs(args, methodObject.parameters, payload);
 
 		// Creates the Method object with the api path and prepared
 		// payload object
