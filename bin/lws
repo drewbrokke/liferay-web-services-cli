@@ -215,6 +215,66 @@ function printParameters(methodObject) {
 	});
 }
 
+function addDefaultValuesFromConfig(defaultValues, currentValues) {
+	if (!_.isEmpty(defaultValues)) {
+		_.forEach(defaultValues, function(value, key) {
+			if (currentValues.hasOwnProperty(key)) {
+				currentValues[key] = value;
+			}
+		});
+	}
+
+	return currentValues;
+}
+
+function testRequiredParams(requiredParams, userParams, cacheParams) {
+	var unfulfilled = _.difference(requiredParams, userParams);
+	unfulfilled = _.difference(unfulfilled, cacheParams);
+
+	if (unfulfilled.length) {
+		console.log('Required parameters not provided: ');
+
+		_.forEach(unfulfilled, function(parameter) {
+			console.log('parameter: ', parameter);
+		});
+
+		throw new Error();
+	}
+
+	return false;
+}
+
+function addValuesFromCache(cache, requiredParams, currentValues) {
+	_.forEach(requiredParams, function(requiredParam) {
+		if (!!cache[requiredParam]) {
+			currentValues[requiredParam] = cache[requiredParam];
+		}
+	});
+
+	return currentValues;
+}
+
+function addValuesFromUserArgs(userArgs, methodParameters, currentValues) {
+	_.forEach(userArgs, function(value, key) {
+		if (currentValues.hasOwnProperty(key)) {
+			currentValues[key] = value;
+
+			// If the parameter type is an array, assemble an array
+			_.forEach(methodParameters, function(parameter) {
+				if (parameter.name === key && contains(parameter.type, '[]')) {
+					var arr = [];
+
+					arr.push(value);
+
+					currentValues[key] = JSON.stringify(arr);
+				}
+			});
+		}
+	});
+
+	return currentValues;
+}
+
 // Begin Getting...
 
 function listServices(html) {
@@ -328,66 +388,6 @@ function prepareJobs(methodObject) {
 	// calling a command multiple times (e.g. adding 20 users)
 	var jobs = [];
 	var numberOfIterations = (args.n && typeof args.n === 'number') ? args.n : 1;
-
-	function addDefaultValuesFromConfig(defaultValues, currentValues) {
-		if (!_.isEmpty(defaultValues)) {
-			_.forEach(defaultValues, function(value, key) {
-				if (currentValues.hasOwnProperty(key)) {
-					currentValues[key] = value;
-				}
-			});
-		}
-
-		return currentValues;
-	}
-
-	function testRequiredParams(requiredParams, userParams, cacheParams) {
-		var unfulfilled = _.difference(requiredParams, userParams);
-		unfulfilled = _.difference(unfulfilled, cacheParams);
-
-		if (unfulfilled.length) {
-			console.log('Required parameters not provided: ');
-
-			_.forEach(unfulfilled, function(parameter) {
-				console.log('parameter: ', parameter);
-			});
-
-			throw new Error();
-		}
-
-		return false;
-	}
-
-	function addValuesFromCache(cache, requiredParams, currentValues) {
-		_.forEach(requiredParams, function(requiredParam) {
-			if (!!cache[requiredParam]) {
-				currentValues[requiredParam] = cache[requiredParam];
-			}
-		});
-
-		return currentValues;
-	}
-
-	function addValuesFromUserArgs(userArgs, methodParameters, currentValues) {
-		_.forEach(userArgs, function(value, key) {
-			if (currentValues.hasOwnProperty(key)) {
-				currentValues[key] = value;
-
-				// If the parameter type is an array, assemble an array
-				_.forEach(methodParameters, function(parameter) {
-					if (parameter.name === key && contains(parameter.type, '[]')) {
-						var arr = [];
-
-						arr.push(value);
-
-						currentValues[key] = JSON.stringify(arr);
-					}
-				});
-			}
-		});
-
-		return currentValues;
-	}
 
 	while(numberOfIterations) {
 		// Adds default values from method configuration
