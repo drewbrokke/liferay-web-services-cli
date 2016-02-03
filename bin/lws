@@ -70,8 +70,6 @@ setServiceAndMethodValues();
 
 var CACHE = {};
 
-var getDefaultValues = require('../lib/defaultValues');
-
 // Util Methods
 
 function contains(s, p) {
@@ -103,9 +101,24 @@ function lowerCaseFirstLetter(s) {
 	return s.join('');
 }
 
+function getDefaultValues(service) {
+	var path = '../lib/serviceConfigs/' + service;
+
+	try {
+		var serviceGetter = require(path);
+
+		return serviceGetter();
+	}
+	catch(e) {
+		console.log('e: ', e);
+	}
+
+	return null;
+}
+
 function getServiceConfig(service) {
 	if (isServiceConfigExists(service)) {
-		return getDefaultValues()[service];
+		return getDefaultValues(service);
 	}
 
 	return null;
@@ -120,7 +133,7 @@ function getMethodConfig(service, method) {
 }
 
 function isServiceConfigExists(service) {
-	return !!getDefaultValues()[service];
+	return !!getDefaultValues(service);
 }
 
 function isMethodConfigExists(service, method) {
