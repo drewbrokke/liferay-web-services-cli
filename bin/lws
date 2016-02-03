@@ -217,46 +217,40 @@ function printParameters(methodObject) {
 
 // Begin Getting...
 
-function listServices() {
-	get(URL, AUTH)
-		.then(function(html) {
-			var $ = cheerio.load(html);
+function listServices(html) {
+	var $ = cheerio.load(html);
 
-			var headings = _.trim($('.panel-heading .title-text').text()).split('  ');
+	var headings = _.trim($('.panel-heading .title-text').text()).split('  ');
 
-			console.log('');
-			console.log('Available Services:');
-			_.forEach(headings, function(heading) {
-				console.log(heading);
-			});
-			console.log('');
-		});
+	console.log('');
+	console.log('Available Services:');
+	_.forEach(headings, function(heading) {
+		console.log(heading);
+	});
+	console.log('');
 }
 
-function listServiceMethods() {
-	get(URL, AUTH)
-		.then(function(html) {
-			var $ = cheerio.load(html);
+function listServiceMethods(html) {
+	var $ = cheerio.load(html);
 
-			var serviceBlock = $('#' + SERVICE_ID);
+	var serviceBlock = $('#' + SERVICE_ID);
 
-			if (serviceBlock.length) {
-				var methodLinks = _.trim($(serviceBlock).find('.lfr-api-signature .method-name').text()).split('  ');
+	if (serviceBlock.length) {
+		var methodLinks = _.trim($(serviceBlock).find('.lfr-api-signature .method-name').text()).split('  ');
 
-				console.log('');
-				console.log('Available Methods for ' + SERVICE + ': (Names in ' + chalk.green.bold('green') +' are ready to use)');
+		console.log('');
+		console.log('Available Methods for ' + SERVICE + ': (Names in ' + chalk.green.bold('green') +' are ready to use)');
 
-				_.forEach(methodLinks, function(methodLink) {
-					if (isMethodConfigExists(SERVICE, methodLink)) {
-						console.log(chalk.green.bold(methodLink));
-					}
-					else {
-						console.log(methodLink);
-					}
-				});
-				console.log('');
+		_.forEach(methodLinks, function(methodLink) {
+			if (isMethodConfigExists(SERVICE, methodLink)) {
+				console.log(chalk.green.bold(methodLink));
+			}
+			else {
+				console.log(methodLink);
 			}
 		});
+		console.log('');
+	}
 }
 
 function getMethodPageHTML(html) {
@@ -520,8 +514,10 @@ else if (METHOD !== null) {
 	}
 }
 else if (SERVICE_ID !== null) {
-	listServiceMethods();
+	get(URL, AUTH)
+		.then(listServiceMethods);
 }
 else {
-	listServices();
+	get(URL, AUTH)
+		.then(listServices);
 }
