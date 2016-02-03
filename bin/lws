@@ -172,15 +172,10 @@ function makeBasicPayloadObjectFromParams(params) {
 }
 
 function printParameters(methodObject) {
-	var DEFAULT_VALUES = getDefaultValues();
-	var serviceConfig = DEFAULT_VALUES[SERVICE];
-	var methodConfig = null;
 	var requiredParams = [];
 	var hasDefaultValueParams = [];
 
-	if (!!serviceConfig) {
-		methodConfig = serviceConfig[methodObject.name];
-	}
+	var methodConfig = getMethodConfig(SERVICE, METHOD);
 
 	if (!!methodConfig) {
 		if (methodConfig.params) {
@@ -332,46 +327,42 @@ function prepareJobs(methodObject) {
 	while(numberOfIterations) {
 		// Adds default values from method configuration
 		var payload = _.extend({}, payloadTemplate);
-		var DEFAULT_VALUES = getDefaultValues();
-		var serviceConfig = DEFAULT_VALUES[methodObject.service];
 
-		if (!!serviceConfig) {
-			var methodConfig = serviceConfig[methodObject.name];
+		var methodConfig = getMethodConfig(methodObject.service, methodObject.name);
 
-			if (!!methodConfig) {
-				var methodDefaultValues = methodConfig.params;
+		if (!!methodConfig) {
+			var methodDefaultValues = methodConfig.params;
 
-				// Adds default values from config file
-				if (!!methodDefaultValues) {
-					_.forEach(methodDefaultValues, function(value, key) {
-						if (payload.hasOwnProperty(key)) {
-							payload[key] = value;
-						}
-					});
-				}
-
-				var requiredParams = methodConfig.requiredParams;
-
-				if (!!requiredParams && requiredParams.length) {
-					var unfulfilled = _.difference(requiredParams, _.keys(args));
-					unfulfilled = _.difference(unfulfilled, _.keys(CACHE));
-
-					if (unfulfilled.length) {
-						console.log('Required parameters not provided: ');
-
-						_.forEach(unfulfilled, function(parameter) {
-							console.log('parameter: ', parameter);
-						});
-
-						throw new Error();
+			// Adds default values from config file
+			if (!!methodDefaultValues) {
+				_.forEach(methodDefaultValues, function(value, key) {
+					if (payload.hasOwnProperty(key)) {
+						payload[key] = value;
 					}
+				});
+			}
 
-					_.forEach(requiredParams, function(requiredParam) {
-						if (!!CACHE[requiredParam]) {
-							payload[requiredParam] = CACHE[requiredParam];
-						}
+			var requiredParams = methodConfig.requiredParams;
+
+			if (!!requiredParams && requiredParams.length) {
+				var unfulfilled = _.difference(requiredParams, _.keys(args));
+				unfulfilled = _.difference(unfulfilled, _.keys(CACHE));
+
+				if (unfulfilled.length) {
+					console.log('Required parameters not provided: ');
+
+					_.forEach(unfulfilled, function(parameter) {
+						console.log('parameter: ', parameter);
 					});
+
+					throw new Error();
 				}
+
+				_.forEach(requiredParams, function(requiredParam) {
+					if (!!CACHE[requiredParam]) {
+						payload[requiredParam] = CACHE[requiredParam];
+					}
+				});
 			}
 		}
 
@@ -428,20 +419,16 @@ function displayAndCacheResults(results) {
 		results = results[0];
 	}
 
-	var DEFAULT_VALUES = getDefaultValues();
-
 	var cacheIds = [];
 	var displayKeys = null;
 	var displayValues = [];
 
 	var methodOmitFromResultsDisplayKeys = [];
 
-	if (DEFAULT_VALUES[SERVICE] &&
-		DEFAULT_VALUES[SERVICE][METHOD] &&
-		DEFAULT_VALUES[SERVICE][METHOD].omitFromResultsDisplayKeys &&
-		DEFAULT_VALUES[SERVICE][METHOD].omitFromResultsDisplayKeys.length) {
+	var methodConfig = getMethodConfig(SERVICE, METHOD);
 
-		methodOmitFromResultsDisplayKeys = DEFAULT_VALUES[SERVICE][METHOD].omitFromResultsDisplayKeys;
+	if (!!methodConfig) {
+		methodOmitFromResultsDisplayKeys = methodConfig.omitFromResultsDisplayKeys;
 	}
 
 	_.forEach(results, function(result) {
