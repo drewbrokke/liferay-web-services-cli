@@ -246,10 +246,8 @@ function listServiceMethods() {
 				console.log('');
 				console.log('Available Methods for ' + SERVICE + ': (Names in ' + chalk.green.bold('green') +' are ready to use)');
 
-				var DEFAULT_VALUES = getDefaultValues();
-
 				_.forEach(methodLinks, function(methodLink) {
-					if (!!DEFAULT_VALUES[SERVICE] && !!DEFAULT_VALUES[SERVICE][methodLink]) {
+					if (isMethodConfigExists(SERVICE, methodLink)) {
 						console.log(chalk.green.bold(methodLink));
 					}
 					else {
