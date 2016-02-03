@@ -103,6 +103,34 @@ function lowerCaseFirstLetter(s) {
 	return s.join('');
 }
 
+function getServiceConfig(service) {
+	if (isServiceConfigExists(service)) {
+		return getDefaultValues()[service];
+	}
+
+	return null;
+}
+
+function getMethodConfig(service, method) {
+	if (isMethodConfigExists(service, method)) {
+		return getServiceConfig(service)[method];
+	}
+
+	return null;
+}
+
+function isServiceConfigExists(service) {
+	return !!getDefaultValues()[service];
+}
+
+function isMethodConfigExists(service, method) {
+	if (isServiceConfigExists(service)) {
+		return !!getServiceConfig(service)[method];
+	}
+
+	return false;
+}
+
 function makeBasicPayloadObjectFromParams(params) {
 	var payload = {};
 
