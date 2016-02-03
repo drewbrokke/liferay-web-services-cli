@@ -109,9 +109,7 @@ function getDefaultValues(service) {
 
 		return serviceGetter();
 	}
-	catch(e) {
-		console.log('e: ', e);
-	}
+	catch(e) {}
 
 	return null;
 }
