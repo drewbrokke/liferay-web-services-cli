@@ -1,45 +1,27 @@
 #!/usr/bin/env node
 
-var args = require('yargs').argv;
+// PACKAGES
 var capitalize = require('capitalize');
 var chalk = require('chalk');
 var cheerio = require('cheerio');
 var Promise = require('bluebird');
-var request = require('request');
 var _ = require('lodash');
 
-var Method = require('../lib/Method');
+// PARSE ARGUMENTS
+var args = require('yargs').argv;
 
+// UTILITIES
+var apiGetter = require('../lib/apiGetter');
+var Method = require('../lib/Method');
 var outputUtil = require('../lib/utils/outputUtil');
 
-// Constants
-var URL_BASE = 'http://localhost:8080';
-
-var URL = URL_BASE + '/api/jsonws';
-
-var AUTH = {
-	username: 'test',
-	password: 'test'
-};
-
+// CONSTANTS
 var COMPANY_ID = require('../lib/utils/configUtil').getCurrentCompanyId();
 var REQUEST_LIMIT = 15;
 
-// Variables
-
+// VARIABLES
 // The calls variable is used to queue up multiple method calls for chaining
-var CALLS = [];
-
-if (args._.indexOf('$') !== -1) {
-	CALLS = args._.join(' ').split(' $ ');
-
-	CALLS = _.map(CALLS, function(call) {
-		return call.split(' ');
-	});
-}
-else if (args._.length) {
-	CALLS.push(args._);
-}
+var CALLS = parseCallsFromPlainArgs(args._);
 
 var CALL_COUNT = 0;
 
@@ -48,47 +30,12 @@ var SERVICE_IMPL = null;
 var SERVICE_ID = null;
 var METHOD = null;
 
-function setServiceAndMethodValues() {
-	var currentCall = CALLS[CALL_COUNT];
-
-	if (!!currentCall) {
-		SERVICE = capitalize.words(currentCall[0]);
-		SERVICE_IMPL = SERVICE + 'ServiceImpl';
-		SERVICE_ID = 'apiService' + SERVICE_IMPL + 'Panel';
-
-		if (currentCall.length > 1) {
-			METHOD = currentCall[1];
-
-			if (METHOD.indexOf('-') === -1) {
-				METHOD = _.kebabCase(METHOD);
-			}
-		}
-	}
-}
-
-setServiceAndMethodValues();
-
 var CACHE = {};
 
 // Util Methods
 
 function contains(s, p) {
 	return s.indexOf(p) !== -1;
-}
-
-function get(URL, AUTH) {
-	return new Promise(function(resolve, reject) {
-		function getCallback(err, response, body) {
-			if (!err) {
-				resolve(body);
-			}
-			else {
-				reject(err);
-			}
-		}
-
-		request(URL, getCallback).auth(AUTH.username, AUTH.password);
-	});
 }
 
 function lowerCaseFirstLetter(s) {
@@ -140,6 +87,41 @@ function isMethodConfigExists(service, method) {
 	}
 
 	return false;
+}
+
+function parseCallsFromPlainArgs(plainArgs) {
+	var calls = [];
+
+	if (plainArgs.indexOf('$') !== -1) {
+		calls = plainArgs.join(' ').split(' $ ');
+
+		calls = _.map(calls, function(call) {
+			return call.split(' ');
+		});
+	}
+	else if (plainArgs.length) {
+		calls.push(plainArgs);
+	}
+
+	return calls;
+}
+
+function setServiceAndMethodValues() {
+	var currentCall = CALLS[CALL_COUNT];
+
+	if (!!currentCall) {
+		SERVICE = capitalize.words(currentCall[0]);
+		SERVICE_IMPL = SERVICE + 'ServiceImpl';
+		SERVICE_ID = 'apiService' + SERVICE_IMPL + 'Panel';
+
+		if (currentCall.length > 1) {
+			METHOD = currentCall[1];
+
+			if (METHOD.indexOf('-') === -1) {
+				METHOD = _.kebabCase(METHOD);
+			}
+		}
+	}
 }
 
 function makeBasicPayloadObjectFromParams(params) {
@@ -289,6 +271,7 @@ function listServices(html) {
 }
 
 function listServiceMethods(html) {
+	console.log('listServiceMethods');
 	var $ = cheerio.load(html);
 
 	var serviceBlock = $('#' + SERVICE_ID);
@@ -328,7 +311,7 @@ function getMethodPageHTML(html) {
 			var methodURL = $(methodAnchorTag).attr('href');
 
 			// return the html of the method page
-			return get(URL_BASE + methodURL, AUTH);
+			return apiGetter(methodURL);
 		}
 		else {
 			throw new Error('No method found...');
@@ -510,7 +493,7 @@ function displayAndCacheResults(results) {
 }
 
 function callCurrentJob() {
-	return get(URL, AUTH)
+	return apiGetter()
 		.then(getMethodPageHTML)
 		.then(getMethodObjectFromMethodPageHTML)
 		.then(prepareJobs)
@@ -519,12 +502,14 @@ function callCurrentJob() {
 		.catch(function(e) {});
 }
 
+setServiceAndMethodValues();
+
 if (args.c) {
 	require('./config');
 }
 else if (METHOD !== null) {
 	if (args.p) {
-		get(URL, AUTH)
+		apiGetter()
 			.then(getMethodPageHTML)
 			.then(getMethodObjectFromMethodPageHTML)
 			.then(printParameters);
@@ -535,10 +520,10 @@ else if (METHOD !== null) {
 	}
 }
 else if (SERVICE_ID !== null) {
-	get(URL, AUTH)
+	apiGetter()
 		.then(listServiceMethods);
 }
 else {
-	get(URL, AUTH)
+	apiGetter()
 		.then(listServices);
 }
