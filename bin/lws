@@ -6,8 +6,22 @@ var RUN = true;
 var capitalize = require('capitalize');
 var chalk = require('chalk');
 var cheerio = require('cheerio');
+var fs = require('fs-extra');
+var path = require('path');
 var Promise = require('bluebird');
+var userhome = require('userhome');
 var _ = require('lodash');
+
+var serviceMethodCachePath = path.join(userhome(), '.lws', 'cache.json');
+
+fs.ensureFileSync(serviceMethodCachePath);
+
+var serviceMethodCache = {};
+
+try {
+	serviceMethodCache = fs.readJSONSync(serviceMethodCachePath);
+}
+catch(e) {}
 
 // PARSE ARGUMENTS
 var args = require('yargs')
@@ -269,17 +283,33 @@ function addValuesFromUserArgs(userArgs, methodParameters, currentValues) {
 	return currentValues;
 }
 
+function updateServiceMethodCache() {
+	fs.writeJSONSync(serviceMethodCachePath, serviceMethodCache);
+}
+
+function getServicesListFromServiceMethodCache() {
+	return serviceMethodCache.services || [];
+}
+
+function getServiceMethodsListFromServiceMethodCache() {
+	if (!!serviceMethodCache.methods) {
+		return serviceMethodCache.methods[SERVICE] || [];
+	}
+
+	return [];
+}
+
 // Begin Getting...
 
-function getServices(html) {
+function getServicesListFromHTML(html) {
 	var $ = cheerio.load(html);
 
-	var services = _.trim($('.panel-heading .title-text').text()).split('  ');
+	services = _.trim($('.panel-heading .title-text').text()).split('  ');
 
 	return services;
 }
 
-function getServiceMethods(html) {
+function getServiceMethodsListFromHTML(html) {
 	var $ = cheerio.load(html);
 
 	var serviceBlock = $('#' + SERVICE_ID);
@@ -293,8 +323,46 @@ function getServiceMethods(html) {
 	return methodLinks;
 }
 
+function cacheServicesList(servicesList) {
+	serviceMethodCache.services = servicesList;
+
+	updateServiceMethodCache();
+}
+
+function cacheServiceMethodsList(serviceMethodsList) {
+	serviceMethodCache.methods = serviceMethodCache.methods || {};
+
+	serviceMethodCache.methods[SERVICE] = serviceMethodsList;
+
+	updateServiceMethodCache();
+}
+
+function getServicesList(html) {
+	var servicesList = getServicesListFromServiceMethodCache();
+
+	if (!servicesList.length && !!html) {
+		servicesList = getServicesListFromHTML(html);
+
+		cacheServicesList(servicesList);
+	}
+
+	return servicesList;
+}
+
+function getServiceMethodsList(html) {
+	var serviceMethodsList = getServiceMethodsListFromServiceMethodCache();
+
+	if (!serviceMethodsList.length && !!html) {
+		serviceMethodsList = getServiceMethodsListFromHTML(html);
+
+		cacheServiceMethodsList(serviceMethodsList);
+	}
+
+	return serviceMethodsList;
+}
+
 function listServices(html) {
-	var services = getServices(html);
+	var services = getServicesList(html);
 
 	console.log('');
 	console.log('Available Services:');
@@ -305,7 +373,7 @@ function listServices(html) {
 }
 
 function listServiceMethods(html) {
-	var methodLinks = getServiceMethods(html);
+	var methodLinks = getServiceMethodsList(html);
 
 	if (methodLinks.length) {
 		console.log('');
@@ -537,6 +605,9 @@ if (RUN) {
 	if (args.c) {
 		require('./config');
 	}
+	if (args.x) {
+		fs.writeJSONSync(serviceMethodCachePath, {});
+	}
 	else if (METHOD !== null) {
 		if (args.p) {
 			apiGetter()
@@ -576,18 +647,33 @@ function startAutoComplete(services, serviceMethods) {
 
 if (process.argv.indexOf('--compgen') !== -1) {
 	if (process.argv.indexOf('2')  !== -1) {
-		apiGetter()
-			.then(getServices)
-			.then(function(services) {
-				startAutoComplete(services, []);
-			});
+		var servicesList = getServicesList();
+
+		if (servicesList.length) {
+			startAutoComplete(servicesList, []);
+		}
+		else {
+			apiGetter()
+				.then(getServicesList)
+				.then(function(services) {
+					startAutoComplete(services, []);
+				});
+		}
+
 	}
 	else if (process.argv.indexOf('3')  !== -1) {
-		apiGetter()
-			.then(getServiceMethods)
-			.then(function(serviceMethods) {
-				startAutoComplete([], serviceMethods);
-			});
+		var serviceMethodsList = getServiceMethodsList();
+
+		if (serviceMethodsList.length) {
+			startAutoComplete([], serviceMethodsList);
+		}
+		else {
+			apiGetter()
+				.then(getServiceMethodsList)
+				.then(function(serviceMethods) {
+					startAutoComplete([], serviceMethods);
+				});
+		}
 	}
 }
 
