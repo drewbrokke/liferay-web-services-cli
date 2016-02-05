@@ -10,7 +10,19 @@ var Promise = require('bluebird');
 var _ = require('lodash');
 
 // PARSE ARGUMENTS
-var args = require('yargs').argv;
+var args = require('yargs')
+	.usage('\nUsage: ' + chalk.white.bold('lws ') + chalk.green('<service> ') + chalk.blue('<method> ') + chalk.yellow('[parameters]'))
+	.alias('c', 'config')
+	.boolean('c')
+	.describe('c', 'Configure liferay instance setups')
+	.alias('n', 'number')
+	.describe('n', 'The number of times to run the command')
+	.alias('p', 'print')
+	.boolean('p')
+	.describe('p', 'Print the available arguments for the supplied methods')
+	.help('h')
+	.alias('h', 'help')
+	.argv;
 
 // UTILITIES
 var apiGetter = require('../lib/apiGetter');
