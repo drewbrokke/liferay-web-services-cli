@@ -547,23 +547,35 @@ if (RUN) {
 	}
 }
 
-apiGetter()
-	.then(getServices)
-	.then(function(services) {
+function startAutoComplete(services, serviceMethods) {
+	var omelette = require("omelette");
+	var complete = omelette("lws <service> <serviceMethod>");
+
+	complete.on('service', function() {
+		complete.reply(services);
+	});
+
+	complete.on('serviceMethod', function(service) {
+		complete.reply(serviceMethods);
+	});
+
+	complete.init();
+}
+
+if (process.argv.indexOf('--compgen') !== -1) {
+	if (process.argv.indexOf('2')  !== -1) {
+		apiGetter()
+			.then(getServices)
+			.then(function(services) {
+				startAutoComplete(services, []);
+			});
+	}
+	else if (process.argv.indexOf('3')  !== -1) {
 		apiGetter()
 			.then(getServiceMethods)
 			.then(function(serviceMethods) {
-				var omelette = require("omelette");
-				var complete = omelette("lws <service> <serviceMethod>");
-
-				complete.on('service', function() {
-					complete.reply(services);
-				});
-
-				complete.on('serviceMethod', function(service) {
-					complete.reply(serviceMethods);
-				});
-
-				complete.init();
+				startAutoComplete([], serviceMethods);
 			});
-	});
+	}
+}
+
