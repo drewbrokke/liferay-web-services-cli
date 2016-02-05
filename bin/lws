@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+var RUN = true;
+
 // PACKAGES
 var capitalize = require('capitalize');
 var chalk = require('chalk');
@@ -257,28 +259,43 @@ function addValuesFromUserArgs(userArgs, methodParameters, currentValues) {
 
 // Begin Getting...
 
-function listServices(html) {
+function getServices(html) {
 	var $ = cheerio.load(html);
 
-	var headings = _.trim($('.panel-heading .title-text').text()).split('  ');
+	var services = _.trim($('.panel-heading .title-text').text()).split('  ');
+
+	return services;
+}
+
+function getServiceMethods(html) {
+	var $ = cheerio.load(html);
+
+	var serviceBlock = $('#' + SERVICE_ID);
+
+	var methodLinks = [];
+
+	if (serviceBlock.length) {
+		methodLinks = _.trim($(serviceBlock).find('.lfr-api-signature .method-name').text()).split('  ');
+	}
+
+	return methodLinks;
+}
+
+function listServices(html) {
+	var services = getServices(html);
 
 	console.log('');
 	console.log('Available Services:');
-	_.forEach(headings, function(heading) {
-		console.log(heading);
+	_.forEach(services, function(service) {
+		console.log(service);
 	});
 	console.log('');
 }
 
 function listServiceMethods(html) {
-	console.log('listServiceMethods');
-	var $ = cheerio.load(html);
+	var methodLinks = getServiceMethods(html);
 
-	var serviceBlock = $('#' + SERVICE_ID);
-
-	if (serviceBlock.length) {
-		var methodLinks = _.trim($(serviceBlock).find('.lfr-api-signature .method-name').text()).split('  ');
-
+	if (methodLinks.length) {
 		console.log('');
 		console.log('Available Methods for ' + SERVICE + ': (Names in ' + chalk.green.bold('green') +' are ready to use)');
 
@@ -504,26 +521,49 @@ function callCurrentJob() {
 
 setServiceAndMethodValues();
 
-if (args.c) {
-	require('./config');
-}
-else if (METHOD !== null) {
-	if (args.p) {
+if (RUN) {
+	if (args.c) {
+		require('./config');
+	}
+	else if (METHOD !== null) {
+		if (args.p) {
+			apiGetter()
+				.then(getMethodPageHTML)
+				.then(getMethodObjectFromMethodPageHTML)
+				.then(printParameters);
+		}
+		else {
+			// This is the actual api call
+			callCurrentJob();
+		}
+	}
+	else if (SERVICE_ID !== null) {
 		apiGetter()
-			.then(getMethodPageHTML)
-			.then(getMethodObjectFromMethodPageHTML)
-			.then(printParameters);
+			.then(listServiceMethods);
 	}
 	else {
-		// This is the actual api call
-		callCurrentJob();
+		apiGetter()
+			.then(listServices);
 	}
 }
-else if (SERVICE_ID !== null) {
-	apiGetter()
-		.then(listServiceMethods);
-}
-else {
-	apiGetter()
-		.then(listServices);
-}
+
+apiGetter()
+	.then(getServices)
+	.then(function(services) {
+		apiGetter()
+			.then(getServiceMethods)
+			.then(function(serviceMethods) {
+				var omelette = require("omelette");
+				var complete = omelette("lws <service> <serviceMethod>");
+
+				complete.on('service', function() {
+					complete.reply(services);
+				});
+
+				complete.on('serviceMethod', function(service) {
+					complete.reply(serviceMethods);
+				});
+
+				complete.init();
+			});
+	});
