@@ -12,17 +12,6 @@ var Promise = require('bluebird');
 var userhome = require('userhome');
 var _ = require('lodash');
 
-var serviceMethodCachePath = path.join(userhome(), '.lws', 'cache.json');
-
-fs.ensureFileSync(serviceMethodCachePath);
-
-var serviceMethodCache = {};
-
-try {
-	serviceMethodCache = fs.readJSONSync(serviceMethodCachePath);
-}
-catch(e) {}
-
 // PARSE ARGUMENTS
 var args = require('yargs')
 	.usage('\nUsage: ' + chalk.white.bold('lws ') + chalk.green('<service> ') + chalk.blue('<method> ') + chalk.yellow('[parameters]'))
@@ -41,6 +30,7 @@ var args = require('yargs')
 // UTILITIES
 var apiGetter = require('../lib/apiGetter');
 var Method = require('../lib/Method');
+var configUtil = require('../lib/utils/configUtil');
 var outputUtil = require('../lib/utils/outputUtil');
 
 // CONSTANTS
@@ -48,6 +38,17 @@ var COMPANY_ID = require('../lib/utils/configUtil').getCurrentCompanyId();
 var REQUEST_LIMIT = 15;
 
 // VARIABLES
+var serviceMethodCachePath = path.join(userhome(), '.lws', 'cache', configUtil.getCurrentInstanceName() + '.json');
+
+fs.ensureFileSync(serviceMethodCachePath);
+
+var serviceMethodCache = {};
+
+try {
+	serviceMethodCache = fs.readJSONSync(serviceMethodCachePath);
+}
+catch(e) {}
+
 // The calls variable is used to queue up multiple method calls for chaining
 var CALLS = parseCallsFromPlainArgs(args._);
 
