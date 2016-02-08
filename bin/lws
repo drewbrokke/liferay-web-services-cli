@@ -23,12 +23,15 @@ var args = require('yargs')
 	.boolean('p')
 	.boolean('x')
 	.default('context', '')
+	.default('number', 1)
 	.describe('context', 'The service context to use')
 	.describe('config', 'Configure liferay instance setups')
 	.describe('number', 'The number of times to run the supplied method')
 	.describe('print', 'Print the available arguments for the supplied methods')
 	.describe('x', 'Clear the services and method names cache')
 	.help('h')
+	.nargs('context', 1)
+	.nargs('number', 1)
 	.argv;
 
 // UTILITIES
