@@ -15,9 +15,10 @@ var _ = require('lodash');
 // PARSE ARGUMENTS
 var args = require('yargs')
 	.usage('\nUsage: ' + chalk.white.bold('lws ') + chalk.green('<service> ') + chalk.blue('<method> ') + chalk.yellow('[parameters]'))
-	.alias('c', 'config')
-	.boolean('c')
-	.describe('c', 'Configure liferay instance setups')
+	.alias('c', 'context')
+	.default('context', '')
+	.boolean('config')
+	.describe('config', 'Configure liferay instance setups')
 	.alias('n', 'number')
 	.describe('n', 'The number of times to run the supplied method')
 	.alias('p', 'print')
@@ -605,7 +606,7 @@ function callCurrentJob() {
 setServiceAndMethodValues();
 
 if (RUN) {
-	if (args.c) {
+	if (args.config) {
 		require('./config');
 	}
 	if (args.x) {
