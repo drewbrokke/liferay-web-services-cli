@@ -611,7 +611,7 @@ function startAutoComplete(services, serviceMethods) {
 	var complete = omelette("lws <service> <serviceMethod>");
 
 	complete.on('service', function() {
-		complete.reply(_.map(services, lowerCaseFirstLetter));
+		complete.reply(services);
 	});
 
 	complete.on('serviceMethod', function(service) {
