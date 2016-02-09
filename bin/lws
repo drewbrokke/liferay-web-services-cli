@@ -298,12 +298,12 @@ function updateServiceMethodCache() {
 	fs.writeJSONSync(serviceMethodCachePath, serviceMethodCache);
 }
 
-function getServicesListFromServiceMethodCache() {
-	return _.get(serviceMethodCache, [CONTEXT, 'services'], []);
+function getServicesListFromServiceMethodCache(context) {
+	return _.get(serviceMethodCache, [context, 'services'], []);
 }
 
-function getServiceMethodsListFromServiceMethodCache() {
-	return _.get(serviceMethodCache, [CONTEXT, 'methods', SERVICE], []);
+function getServiceMethodsListFromServiceMethodCache(context, service) {
+	return _.get(serviceMethodCache, [context, 'methods', service], []);
 }
 
 // Begin Getting...
@@ -330,37 +330,37 @@ function getServiceMethodsListFromHTML(html) {
 	return methodLinks;
 }
 
-function cacheServicesList(servicesList) {
-	_.set(serviceMethodCache, [CONTEXT, 'services'], servicesList);
+function cacheServicesList(context, servicesList) {
+	_.set(serviceMethodCache, [context, 'services'], servicesList);
 
 	updateServiceMethodCache();
 }
 
-function cacheServiceMethodsList(serviceMethodsList) {
-	_.set(serviceMethodCache, [CONTEXT, 'methods', SERVICE], serviceMethodsList);
+function cacheServiceMethodsList(context, service, serviceMethodsList) {
+	_.set(serviceMethodCache, [context, 'methods', service], serviceMethodsList);
 
 	updateServiceMethodCache();
 }
 
 function getServicesList(html) {
-	var servicesList = getServicesListFromServiceMethodCache();
+	var servicesList = getServicesListFromServiceMethodCache(CONTEXT);
 
 	if (!servicesList.length && !!html) {
 		servicesList = getServicesListFromHTML(html);
 
-		cacheServicesList(servicesList);
+		cacheServicesList(CONTEXT, servicesList);
 	}
 
 	return servicesList;
 }
 
 function getServiceMethodsList(html) {
-	var serviceMethodsList = getServiceMethodsListFromServiceMethodCache();
+	var serviceMethodsList = getServiceMethodsListFromServiceMethodCache(CONTEXT, SERVICE);
 
 	if (!serviceMethodsList.length && !!html) {
 		serviceMethodsList = getServiceMethodsListFromHTML(html);
 
-		cacheServiceMethodsList(serviceMethodsList);
+		cacheServiceMethodsList(CONTEXT, SERVICE, serviceMethodsList);
 	}
 
 	return serviceMethodsList;
@@ -396,7 +396,7 @@ function listServiceMethods(html) {
 	}
 }
 
-function getMethodPageHTML(html) {
+function getMethodPageHTMLFromHTML(html) {
 	// Get link to method page
 	var $ = cheerio.load(html);
 
@@ -596,7 +596,7 @@ function displayAndCacheResults(results) {
 
 function callCurrentJob() {
 	return apiGetter(PATH)
-		.then(getMethodPageHTML)
+		.then(getMethodPageHTMLFromHTML)
 		.then(getMethodObjectFromMethodPageHTML)
 		.then(prepareJobs)
 		.then(callAPI)
@@ -616,7 +616,7 @@ if (RUN) {
 	else if (METHOD !== null) {
 		if (args.p) {
 			apiGetter(PATH)
-				.then(getMethodPageHTML)
+				.then(getMethodPageHTMLFromHTML)
 				.then(getMethodObjectFromMethodPageHTML)
 				.then(printParameters);
 		}
