@@ -335,30 +335,28 @@ function getServiceMethodsList(html) {
 	return serviceMethodsList;
 }
 
-function listServices(html) {
-	var services = getServicesList(html);
-
-	console.log('');
-	console.log('Available Services:');
-	_.forEach(services, function(service) {
-		console.log(service);
-	});
-	console.log('');
+function listServices(serviceNames) {
+	if (serviceNames.length) {
+		console.log('');
+		console.log('Available Services:');
+		_.forEach(serviceNames, function(service) {
+			console.log(service);
+		});
+		console.log('');
+	}
 }
 
-function listServiceMethods(html) {
-	var methodLinks = getServiceMethodsList(html);
-
-	if (methodLinks.length) {
+function listServiceMethods(methodNames) {
+	if (methodNames.length) {
 		console.log('');
 		console.log('Available Methods for ' + SERVICE + ': (Names in ' + chalk.green.bold('green') +' are ready to use)');
 
-		_.forEach(methodLinks, function(methodLink) {
-			if (isMethodConfigExists(SERVICE, methodLink)) {
-				console.log(chalk.green.bold(methodLink));
+		_.forEach(methodNames, function(methodName) {
+			if (isMethodConfigExists(SERVICE, methodName)) {
+				console.log(chalk.green.bold(methodName));
 			}
 			else {
-				console.log(methodLink);
+				console.log(methodName);
 			}
 		});
 		console.log('');
@@ -594,13 +592,17 @@ if (RUN) {
 			callCurrentJob();
 		}
 	}
-	else if (SERVICE_ID !== null) {
-		apiGetter(PATH)
-			.then(listServiceMethods);
-	}
 	else {
+		// List services or methods in a service
 		apiGetter(PATH)
-			.then(listServices);
+			.then(function(html) {
+				if (SERVICE_ID === null) {
+					listServices(getServicesList(html));
+				}
+				else {
+					listServiceMethods(getServiceMethodsList(html));
+				}
+			});
 	}
 }
 
