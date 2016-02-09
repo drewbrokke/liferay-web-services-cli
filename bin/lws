@@ -37,6 +37,8 @@ var args = require('yargs')
 // UTILITIES
 var apiGetter = require('../lib/apiGetter');
 var Method = require('../lib/Method');
+var ServiceMethodCache = require('../lib/ServiceMethodCache');
+
 var configUtil = require('../lib/utils/configUtil');
 var outputUtil = require('../lib/utils/outputUtil');
 
@@ -48,16 +50,7 @@ var PATH = '/api/jsonws?contextName=' + args.context;
 var CONTEXT = !!args.context ? args.context : 'portal';
 
 // VARIABLES
-var serviceMethodCachePath = path.join(userhome(), '.lws', 'cache', configUtil.getCurrentInstanceName() + '.json');
-
-fs.ensureFileSync(serviceMethodCachePath);
-
-var serviceMethodCache = {};
-
-try {
-	serviceMethodCache = fs.readJSONSync(serviceMethodCachePath);
-}
-catch(e) {}
+var serviceMethodCache = new ServiceMethodCache(configUtil.getCurrentInstanceName());
 
 // The calls variable is used to queue up multiple method calls for chaining
 var CALLS = parseCallsFromPlainArgs(args._);
@@ -294,18 +287,6 @@ function addValuesFromUserArgs(userArgs, methodParameters, currentValues) {
 	return currentValues;
 }
 
-function updateServiceMethodCache() {
-	fs.writeJSONSync(serviceMethodCachePath, serviceMethodCache);
-}
-
-function getServicesListFromServiceMethodCache(context) {
-	return _.get(serviceMethodCache, [context, 'services'], []);
-}
-
-function getServiceMethodsListFromServiceMethodCache(context, service) {
-	return _.get(serviceMethodCache, [context, 'methods', service], []);
-}
-
 // Begin Getting...
 
 function getServicesListFromHTML(html) {
@@ -330,37 +311,25 @@ function getServiceMethodsListFromHTML(html) {
 	return methodLinks;
 }
 
-function cacheServicesList(context, servicesList) {
-	_.set(serviceMethodCache, [context, 'services'], servicesList);
-
-	updateServiceMethodCache();
-}
-
-function cacheServiceMethodsList(context, service, serviceMethodsList) {
-	_.set(serviceMethodCache, [context, 'methods', service], serviceMethodsList);
-
-	updateServiceMethodCache();
-}
-
 function getServicesList(html) {
-	var servicesList = getServicesListFromServiceMethodCache(CONTEXT);
+	var servicesList = serviceMethodCache.getServicesList(CONTEXT);
 
 	if (!servicesList.length && !!html) {
 		servicesList = getServicesListFromHTML(html);
 
-		cacheServicesList(CONTEXT, servicesList);
+		serviceMethodCache.cacheServicesList(CONTEXT, servicesList);
 	}
 
 	return servicesList;
 }
 
 function getServiceMethodsList(html) {
-	var serviceMethodsList = getServiceMethodsListFromServiceMethodCache(CONTEXT, SERVICE);
+	var serviceMethodsList = serviceMethodCache.getServiceMethodsList(CONTEXT, SERVICE);
 
 	if (!serviceMethodsList.length && !!html) {
 		serviceMethodsList = getServiceMethodsListFromHTML(html);
 
-		cacheServiceMethodsList(CONTEXT, SERVICE, serviceMethodsList);
+		serviceMethodCache.cacheServiceMethodsList(CONTEXT, SERVICE, serviceMethodsList);
 	}
 
 	return serviceMethodsList;
@@ -611,7 +580,7 @@ if (RUN) {
 		require('./config');
 	}
 	if (args.x) {
-		fs.writeJSONSync(serviceMethodCachePath, {});
+		serviceMethodCache.clearCache();
 	}
 	else if (METHOD !== null) {
 		if (args.p) {
