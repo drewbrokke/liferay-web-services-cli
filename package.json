@@ -3,9 +3,6 @@
   "version": "0.3.0",
   "description": "A command-line interface for Liferay's JSON Web Services",
   "main": "bin/lws",
-  "scripts": {
-    "test": "test"
-  },
   "author": "Drew Brokke",
   "license": "MIT",
   "dependencies": {
