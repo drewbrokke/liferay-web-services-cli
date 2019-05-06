@@ -12,7 +12,7 @@
     "cli-table": "^0.3.1",
     "commander": "^2.7.1",
     "fs-extra": "^0.18.4",
-    "inquirer": "^0.8.5",
+    "inquirer": "^6.3.1",
     "lodash": "^3.6.0",
     "prettyjson": "^1.1.0",
     "progress": "^1.1.8",
