@@ -2,9 +2,6 @@
 
 var lws = module.exports = require('../lib/resources');
 
-var _ = require('lodash');
-var fs = require('fs');
-var path = require('path');
 var program = require('commander');
 
 var configUtil = lws.utils.configUtil;
