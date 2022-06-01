@@ -13,13 +13,12 @@
     "commander": "^2.7.1",
     "fs-extra": "^0.18.4",
     "inquirer": "^6.3.1",
-    "lodash": "^3.6.0",
+    "lodash": "^4.17.21",
     "prettyjson": "^1.1.0",
     "progress": "^1.1.8",
     "request": "^2.53.0",
     "userhome": "^1.0.0"
   },
-  "devDependencies": {},
   "repository": {
     "type": "git",
     "url": "https://github.com/drewbrokke/liferay-web-services-cli.git"
